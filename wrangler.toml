@@ -1,0 +1,15 @@
+name = "roadbook-blackroad"
+main = "src/worker.js"
+compatibility_date = "2026-03-31"
+
+[ai]
+binding = "AI"
+
+[[routes]]
+pattern = "roadbook.blackroad.io/*"
+zone_name = "blackroad.io"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "roadbook"
+database_id = "e4713612-cc6e-4d9f-87dd-d077f562d445"

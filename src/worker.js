@@ -422,12 +422,222 @@ async function ensureTables(db) {
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       FOREIGN KEY (publication_id) REFERENCES roadbook_publications(id)
     )`),
+    // ─── WRITING WORKSHOPS ───
+    db.prepare(`CREATE TABLE IF NOT EXISTS rb_workshops (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      description TEXT,
+      host TEXT DEFAULT 'blackroad',
+      prompt TEXT,
+      status TEXT NOT NULL DEFAULT 'upcoming',
+      max_participants INTEGER DEFAULT 20,
+      scheduled_at TEXT,
+      duration_minutes INTEGER DEFAULT 60,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS rb_workshop_participants (
+      id TEXT PRIMARY KEY,
+      workshop_id TEXT NOT NULL,
+      user_id TEXT NOT NULL,
+      joined_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (workshop_id) REFERENCES rb_workshops(id)
+    )`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS rb_workshop_submissions (
+      id TEXT PRIMARY KEY,
+      workshop_id TEXT NOT NULL,
+      user_id TEXT NOT NULL,
+      content TEXT NOT NULL,
+      title TEXT,
+      feedback TEXT DEFAULT '[]',
+      avg_rating REAL DEFAULT 0,
+      submitted_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (workshop_id) REFERENCES rb_workshops(id)
+    )`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS rb_workshop_feedback (
+      id TEXT PRIMARY KEY,
+      submission_id TEXT NOT NULL,
+      reviewer_id TEXT NOT NULL,
+      rating INTEGER DEFAULT 3,
+      comment TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (submission_id) REFERENCES rb_workshop_submissions(id)
+    )`),
+    // ─── PUBLICATION ANALYTICS ───
+    db.prepare(`CREATE TABLE IF NOT EXISTS rb_pub_analytics (
+      id TEXT PRIMARY KEY,
+      publication_id TEXT NOT NULL,
+      event_date TEXT NOT NULL,
+      views INTEGER DEFAULT 0,
+      reads INTEGER DEFAULT 0,
+      completions INTEGER DEFAULT 0,
+      shares INTEGER DEFAULT 0,
+      avg_read_pct REAL DEFAULT 0,
+      referrers TEXT DEFAULT '{}',
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (publication_id) REFERENCES roadbook_publications(id)
+    )`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS rb_share_events (
+      id TEXT PRIMARY KEY,
+      publication_id TEXT NOT NULL,
+      user_id TEXT,
+      platform TEXT DEFAULT 'link',
+      referrer TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (publication_id) REFERENCES roadbook_publications(id)
+    )`),
+    // ─── CONTENT LICENSING ───
+    db.prepare(`CREATE TABLE IF NOT EXISTS rb_licenses (
+      id TEXT PRIMARY KEY,
+      publication_id TEXT NOT NULL,
+      license_type TEXT NOT NULL DEFAULT 'standard',
+      licensee_name TEXT NOT NULL,
+      licensee_email TEXT,
+      terms TEXT,
+      fee REAL DEFAULT 0,
+      currency TEXT DEFAULT 'USD',
+      status TEXT NOT NULL DEFAULT 'pending',
+      royalty_pct REAL DEFAULT 0,
+      total_royalties_paid REAL DEFAULT 0,
+      granted_at TEXT,
+      expires_at TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (publication_id) REFERENCES roadbook_publications(id)
+    )`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS rb_royalty_payments (
+      id TEXT PRIMARY KEY,
+      license_id TEXT NOT NULL,
+      amount REAL NOT NULL,
+      period_start TEXT,
+      period_end TEXT,
+      status TEXT NOT NULL DEFAULT 'pending',
+      paid_at TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (license_id) REFERENCES rb_licenses(id)
+    )`),
+    // ─── BOOK CLUBS ───
+    db.prepare(`CREATE TABLE IF NOT EXISTS rb_clubs (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      description TEXT,
+      creator TEXT DEFAULT 'blackroad',
+      club_type TEXT DEFAULT 'book',
+      visibility TEXT DEFAULT 'public',
+      member_count INTEGER DEFAULT 0,
+      reading_list TEXT DEFAULT '[]',
+      current_reading_id TEXT,
+      discussion_schedule TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS rb_club_members (
+      id TEXT PRIMARY KEY,
+      club_id TEXT NOT NULL,
+      user_id TEXT NOT NULL,
+      role TEXT DEFAULT 'member',
+      joined_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (club_id) REFERENCES rb_clubs(id)
+    )`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS rb_club_discussions (
+      id TEXT PRIMARY KEY,
+      club_id TEXT NOT NULL,
+      publication_id TEXT,
+      topic TEXT NOT NULL,
+      body TEXT,
+      author TEXT NOT NULL,
+      replies_count INTEGER DEFAULT 0,
+      scheduled_at TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (club_id) REFERENCES rb_clubs(id)
+    )`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS rb_club_discussion_replies (
+      id TEXT PRIMARY KEY,
+      discussion_id TEXT NOT NULL,
+      author TEXT NOT NULL,
+      body TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (discussion_id) REFERENCES rb_club_discussions(id)
+    )`),
+    // ─── TRANSLATION ───
+    db.prepare(`CREATE TABLE IF NOT EXISTS rb_translations (
+      id TEXT PRIMARY KEY,
+      publication_id TEXT NOT NULL,
+      language TEXT NOT NULL,
+      language_name TEXT,
+      translated_title TEXT NOT NULL,
+      translated_content TEXT NOT NULL,
+      translated_summary TEXT,
+      translator TEXT DEFAULT 'ai',
+      status TEXT NOT NULL DEFAULT 'draft',
+      quality_score REAL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (publication_id) REFERENCES roadbook_publications(id)
+    )`),
+    // ─── PODCAST ───
+    db.prepare(`CREATE TABLE IF NOT EXISTS rb_podcasts (
+      id TEXT PRIMARY KEY,
+      publication_id TEXT NOT NULL,
+      title TEXT NOT NULL,
+      description TEXT,
+      narrator TEXT DEFAULT 'ai',
+      duration_seconds INTEGER DEFAULT 0,
+      audio_url TEXT,
+      status TEXT NOT NULL DEFAULT 'pending',
+      episode_number INTEGER,
+      season INTEGER DEFAULT 1,
+      transcript TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (publication_id) REFERENCES roadbook_publications(id)
+    )`),
+    // ─── ACADEMIC CITATIONS ───
+    db.prepare(`CREATE TABLE IF NOT EXISTS rb_bibliographies (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      description TEXT,
+      format TEXT DEFAULT 'apa',
+      entries TEXT DEFAULT '[]',
+      entry_count INTEGER DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    )`),
+    db.prepare(`CREATE TABLE IF NOT EXISTS rb_bibliography_entries (
+      id TEXT PRIMARY KEY,
+      bibliography_id TEXT NOT NULL,
+      publication_id TEXT,
+      doi TEXT,
+      raw_citation TEXT,
+      parsed_data TEXT DEFAULT '{}',
+      entry_type TEXT DEFAULT 'article',
+      sort_key TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (bibliography_id) REFERENCES rb_bibliographies(id)
+    )`),
+    // ─── CONTENT SYNDICATION ───
+    db.prepare(`CREATE TABLE IF NOT EXISTS rb_syndications (
+      id TEXT PRIMARY KEY,
+      publication_id TEXT NOT NULL,
+      platform TEXT NOT NULL,
+      platform_url TEXT,
+      status TEXT NOT NULL DEFAULT 'pending',
+      external_id TEXT,
+      syndicated_at TEXT,
+      last_synced_at TEXT,
+      views_on_platform INTEGER DEFAULT 0,
+      notes TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (publication_id) REFERENCES roadbook_publications(id)
+    )`),
   ]);
 }
 
-async function generateHash(content) {
+async function generateHash(content, title = '', timestamp = '') {
   const encoder = new TextEncoder();
-  const data = encoder.encode(content);
+  const data = encoder.encode((title || '') + content + (timestamp || new Date().toISOString()));
   const hash = await crypto.subtle.digest('SHA-256', data);
   return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
@@ -456,7 +666,8 @@ function estimateReadingTime(text) {
 }
 
 function generateDOI(id) {
-  return `10.blackroad/rb-${id.slice(0, 12)}`;
+  const hex = id.replace(/-/g, '').slice(0, 8);
+  return `road:book:${hex}`;
 }
 
 // ─── Citation Generator Helper ───
@@ -505,8 +716,6 @@ function buildCommentTree(comments) {
   return roots;
 }
 
-let dbReady = false;
-
 export default {
   async fetch(request, env) {
     if (request.method === 'OPTIONS') {
@@ -518,7 +727,7 @@ export default {
     const method = request.method;
 
     if (path === "/" || path === "") return new Response(ROOT_HTML, { headers: { ...CORS, "Content-Type": "text/html;charset=UTF-8" } });
-    if (!dbReady) { await ensureTables(env.DB); dbReady = true; }
+    await ensureTables(env.DB);
 
     // Health
     if ((path === '/health' || path === '/api/health') && method === 'GET') {
@@ -625,11 +834,23 @@ export default {
 
     // List publications
     if (path === '/api/publications' && method === 'GET') {
-      const limit = parseInt(url.searchParams.get('limit') || '50');
-      const result = await env.DB.prepare(
-        "SELECT id, title, summary, category, visibility, license, version, author, reads, citations, reading_time, doi, roadcoin_earned, tags, created_at, updated_at FROM roadbook_publications ORDER BY created_at DESC LIMIT ?"
-      ).bind(limit).all();
-      return json({ publications: result.results });
+      const limit = Math.min(100, parseInt(url.searchParams.get('limit') || '50'));
+      const offset = parseInt(url.searchParams.get('offset') || '0');
+      const author = url.searchParams.get('author');
+      const category = url.searchParams.get('category');
+      const tag = url.searchParams.get('tag');
+      const since = url.searchParams.get('since');
+      let query = "SELECT id, title, summary, category, visibility, license, version, author, reads, citations, reading_time, doi, roadcoin_earned, tags, created_at, updated_at FROM roadbook_publications WHERE visibility != 'deleted'";
+      const params = [];
+      if (author) { query += ' AND author = ?'; params.push(author); }
+      if (category) { query += ' AND category = ?'; params.push(category); }
+      if (tag) { query += ' AND tags LIKE ?'; params.push(`%${tag}%`); }
+      if (since) { query += ' AND created_at >= ?'; params.push(since); }
+      query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
+      params.push(limit, offset);
+      const result = await env.DB.prepare(query).bind(...params).all();
+      const total = await env.DB.prepare("SELECT COUNT(*) as count FROM roadbook_publications WHERE visibility != 'deleted'").first();
+      return json({ publications: result.results, total: total.count, limit, offset });
     }
 
     // Route matching for publication sub-routes
@@ -1067,6 +1288,23 @@ export default {
       return json({ edition: { id, subject: body.subject } }, 201);
     }
 
+    // ─── Collection add alias ───
+    const collAddMatch = path.match(/^\/api\/collections\/([^/]+)\/add$/);
+    if (collAddMatch && method === 'POST') {
+      const body = await request.json();
+      if (!body.publication_id) return json({ error: 'publication_id required' }, 400);
+      const coll = await env.DB.prepare('SELECT id FROM rb_collections WHERE id = ?').bind(collAddMatch[1]).first();
+      if (!coll) return json({ error: 'Collection not found' }, 404);
+      const pub = await env.DB.prepare('SELECT id FROM roadbook_publications WHERE id = ?').bind(body.publication_id).first();
+      if (!pub) return json({ error: 'Publication not found' }, 404);
+      const existing = await env.DB.prepare('SELECT id FROM rb_collection_items WHERE collection_id = ? AND publication_id = ?').bind(collAddMatch[1], body.publication_id).first();
+      if (existing) return json({ error: 'Already in collection' }, 409);
+      const id = crypto.randomUUID();
+      await env.DB.prepare('INSERT INTO rb_collection_items (id, collection_id, publication_id, sort_order) VALUES (?, ?, ?, ?)')
+        .bind(id, collAddMatch[1], body.publication_id, body.sort_order || 0).run();
+      return json({ ok: true, id }, 201);
+    }
+
     // ─── Publication Versions ───
     if (pubVersionsMatch && method === 'GET') {
       const pubId = pubVersionsMatch[1];
@@ -1295,6 +1533,15 @@ export default {
 
       const updated = await env.DB.prepare('SELECT * FROM roadbook_publications WHERE id = ?').bind(pubMatch[1]).first();
       return json({ publication: updated, version: newVersion, hash, prev_hash: prevHash, agent: 'Calliope' });
+    }
+
+    // ─── Soft delete publication ───
+    if (pubMatch && method === 'DELETE') {
+      const pub = await env.DB.prepare('SELECT id, title FROM roadbook_publications WHERE id = ?').bind(pubMatch[1]).first();
+      if (!pub) return json({ error: 'Publication not found' }, 404);
+      await env.DB.prepare("UPDATE roadbook_publications SET visibility = 'deleted', updated_at = datetime('now') WHERE id = ?").bind(pubMatch[1]).run();
+      stampChain('deleted', pubMatch[1], pub.title.slice(0,100)).catch(()=>{});
+      return json({ ok: true, deleted: pubMatch[1], title: pub.title });
     }
 
     // ─── Discover (enhanced with semantic search, category, sort) ───
@@ -2212,6 +2459,1077 @@ export default {
     if (featuredMatch && method === 'DELETE' && !['today', 'trending', 'staff-picks'].includes(featuredMatch[1])) {
       await env.DB.prepare('UPDATE rb_featured SET active = 0 WHERE id = ?').bind(featuredMatch[1]).run();
       return json({ ok: true, deactivated: featuredMatch[1] });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ─── FEATURE 9: Writing Workshops (/api/workshops) ───
+    // ═══════════════════════════════════════════════════════════════
+
+    // List workshops
+    if (path === '/api/workshops' && method === 'GET') {
+      const status = url.searchParams.get('status');
+      let query = `SELECT w.*,
+                   (SELECT COUNT(*) FROM rb_workshop_participants wp WHERE wp.workshop_id = w.id) as participant_count,
+                   (SELECT COUNT(*) FROM rb_workshop_submissions ws WHERE ws.workshop_id = w.id) as submission_count
+                   FROM rb_workshops w`;
+      const params = [];
+      if (status) {
+        query += ' WHERE w.status = ?';
+        params.push(status);
+      }
+      query += ' ORDER BY w.scheduled_at DESC LIMIT 50';
+      const result = await env.DB.prepare(query).bind(...params).all();
+      return json({ workshops: result.results || [] });
+    }
+
+    // Create workshop
+    if (path === '/api/workshops' && method === 'POST') {
+      const body = await request.json();
+      if (!body.title) return json({ error: 'title required' }, 400);
+      const id = crypto.randomUUID();
+
+      // AI-generate a writing prompt if none provided
+      let prompt = body.prompt || '';
+      if (!prompt) {
+        try {
+          const aiResult = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+            messages: [
+              { role: 'system', content: `${AGENTS.calliope.prompt} Generate a creative, inspiring writing prompt for a workshop titled "${body.title}". The prompt should be specific enough to guide writers but open enough for creative interpretation. 2-3 sentences. Return ONLY the prompt.` },
+              { role: 'user', content: `Workshop: ${body.title}\nDescription: ${body.description || 'A writing workshop'}` },
+            ],
+            max_tokens: 200,
+          });
+          if (aiResult.response) prompt = aiResult.response.trim();
+        } catch { prompt = 'Write freely on the workshop theme. Aim for clarity, voice, and originality.'; }
+      }
+
+      await env.DB.prepare(
+        'INSERT INTO rb_workshops (id, title, description, host, prompt, status, max_participants, scheduled_at, duration_minutes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+      ).bind(id, body.title, body.description || '', body.host || 'blackroad', prompt, body.status || 'upcoming', body.max_participants || 20, body.scheduled_at || null, body.duration_minutes || 60).run();
+      const workshop = await env.DB.prepare('SELECT * FROM rb_workshops WHERE id = ?').bind(id).first();
+      return json({ workshop, agent: 'Calliope' }, 201);
+    }
+
+    const workshopMatch = path.match(/^\/api\/workshops\/([^/]+)$/);
+    const workshopJoinMatch = path.match(/^\/api\/workshops\/([^/]+)\/join$/);
+    const workshopSubmitMatch = path.match(/^\/api\/workshops\/([^/]+)\/submit$/);
+    const workshopSubmissionsMatch = path.match(/^\/api\/workshops\/([^/]+)\/submissions$/);
+    const workshopFeedbackMatch = path.match(/^\/api\/workshops\/([^/]+)\/feedback$/);
+
+    // Get single workshop
+    if (workshopMatch && method === 'GET') {
+      const ws = await env.DB.prepare('SELECT * FROM rb_workshops WHERE id = ?').bind(workshopMatch[1]).first();
+      if (!ws) return json({ error: 'Workshop not found' }, 404);
+      const participants = await env.DB.prepare('SELECT * FROM rb_workshop_participants WHERE workshop_id = ? ORDER BY joined_at ASC').bind(workshopMatch[1]).all();
+      const submissions = await env.DB.prepare('SELECT id, user_id, title, avg_rating, submitted_at FROM rb_workshop_submissions WHERE workshop_id = ? ORDER BY submitted_at DESC').bind(workshopMatch[1]).all();
+      return json({ workshop: ws, participants: participants.results || [], submissions: submissions.results || [] });
+    }
+
+    // Update workshop status
+    if (workshopMatch && method === 'PUT') {
+      const ws = await env.DB.prepare('SELECT id FROM rb_workshops WHERE id = ?').bind(workshopMatch[1]).first();
+      if (!ws) return json({ error: 'Workshop not found' }, 404);
+      const body = await request.json();
+      await env.DB.prepare(
+        "UPDATE rb_workshops SET title = COALESCE(?, title), description = COALESCE(?, description), prompt = COALESCE(?, prompt), status = COALESCE(?, status), scheduled_at = COALESCE(?, scheduled_at), updated_at = datetime('now') WHERE id = ?"
+      ).bind(body.title || null, body.description || null, body.prompt || null, body.status || null, body.scheduled_at || null, workshopMatch[1]).run();
+      const updated = await env.DB.prepare('SELECT * FROM rb_workshops WHERE id = ?').bind(workshopMatch[1]).first();
+      return json({ workshop: updated });
+    }
+
+    // Join workshop
+    if (workshopJoinMatch && method === 'POST') {
+      const body = await request.json();
+      if (!body.user_id) return json({ error: 'user_id required' }, 400);
+      const ws = await env.DB.prepare('SELECT * FROM rb_workshops WHERE id = ?').bind(workshopJoinMatch[1]).first();
+      if (!ws) return json({ error: 'Workshop not found' }, 404);
+      const existing = await env.DB.prepare('SELECT id FROM rb_workshop_participants WHERE workshop_id = ? AND user_id = ?').bind(workshopJoinMatch[1], body.user_id).first();
+      if (existing) return json({ error: 'Already joined' }, 409);
+      const count = await env.DB.prepare('SELECT COUNT(*) as c FROM rb_workshop_participants WHERE workshop_id = ?').bind(workshopJoinMatch[1]).first();
+      if (count.c >= ws.max_participants) return json({ error: 'Workshop is full' }, 400);
+      const id = crypto.randomUUID();
+      await env.DB.prepare('INSERT INTO rb_workshop_participants (id, workshop_id, user_id) VALUES (?, ?, ?)').bind(id, workshopJoinMatch[1], body.user_id).run();
+      return json({ ok: true, participant_id: id }, 201);
+    }
+
+    // Submit writing to workshop
+    if (workshopSubmitMatch && method === 'POST') {
+      const body = await request.json();
+      if (!body.user_id || !body.content) return json({ error: 'user_id and content required' }, 400);
+      const ws = await env.DB.prepare('SELECT id, status FROM rb_workshops WHERE id = ?').bind(workshopSubmitMatch[1]).first();
+      if (!ws) return json({ error: 'Workshop not found' }, 404);
+      const participant = await env.DB.prepare('SELECT id FROM rb_workshop_participants WHERE workshop_id = ? AND user_id = ?').bind(workshopSubmitMatch[1], body.user_id).first();
+      if (!participant) return json({ error: 'Must join the workshop first' }, 400);
+      const id = crypto.randomUUID();
+      await env.DB.prepare(
+        'INSERT INTO rb_workshop_submissions (id, workshop_id, user_id, content, title) VALUES (?, ?, ?, ?, ?)'
+      ).bind(id, workshopSubmitMatch[1], body.user_id, body.content.slice(0, 50000), body.title || 'Untitled').run();
+      return json({ ok: true, submission_id: id }, 201);
+    }
+
+    // Get submissions for workshop
+    if (workshopSubmissionsMatch && method === 'GET') {
+      const result = await env.DB.prepare(
+        'SELECT s.*, (SELECT COUNT(*) FROM rb_workshop_feedback f WHERE f.submission_id = s.id) as feedback_count FROM rb_workshop_submissions s WHERE s.workshop_id = ? ORDER BY s.submitted_at DESC'
+      ).bind(workshopSubmissionsMatch[1]).all();
+      return json({ workshop_id: workshopSubmissionsMatch[1], submissions: result.results || [] });
+    }
+
+    // Give feedback on a submission
+    if (workshopFeedbackMatch && method === 'POST') {
+      const body = await request.json();
+      if (!body.submission_id || !body.reviewer_id) return json({ error: 'submission_id and reviewer_id required' }, 400);
+      const sub = await env.DB.prepare('SELECT id, workshop_id FROM rb_workshop_submissions WHERE id = ?').bind(body.submission_id).first();
+      if (!sub) return json({ error: 'Submission not found' }, 404);
+      const rating = Math.min(5, Math.max(1, parseInt(body.rating) || 3));
+
+      // AI-assisted feedback if no comment provided
+      let comment = body.comment || '';
+      if (!comment) {
+        try {
+          const subContent = await env.DB.prepare('SELECT content, title FROM rb_workshop_submissions WHERE id = ?').bind(body.submission_id).first();
+          const aiResult = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+            messages: [
+              { role: 'system', content: `${AGENTS.atticus.prompt} Provide brief, constructive feedback on this workshop submission. Note one strength and one area for improvement. 2-3 sentences. Return ONLY the feedback.` },
+              { role: 'user', content: `Title: ${subContent.title}\n\n${subContent.content.substring(0, 2000)}` },
+            ],
+            max_tokens: 200,
+          });
+          if (aiResult.response) comment = aiResult.response.trim();
+        } catch { comment = 'Feedback pending.'; }
+      }
+
+      const id = crypto.randomUUID();
+      await env.DB.prepare(
+        'INSERT INTO rb_workshop_feedback (id, submission_id, reviewer_id, rating, comment) VALUES (?, ?, ?, ?, ?)'
+      ).bind(id, body.submission_id, body.reviewer_id, rating, comment.slice(0, 3000)).run();
+
+      // Update average rating on submission
+      const avg = await env.DB.prepare('SELECT AVG(rating) as avg FROM rb_workshop_feedback WHERE submission_id = ?').bind(body.submission_id).first();
+      await env.DB.prepare('UPDATE rb_workshop_submissions SET avg_rating = ? WHERE id = ?').bind(avg?.avg || 0, body.submission_id).run();
+
+      return json({ ok: true, feedback_id: id, rating, comment, agent: 'Atticus' }, 201);
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ─── FEATURE 10: Publication Analytics (/api/pub-analytics) ───
+    // ═══════════════════════════════════════════════════════════════
+
+    // Track a view/read/share event for per-article analytics
+    if (path === '/api/pub-analytics/track' && method === 'POST') {
+      const body = await request.json();
+      if (!body.publication_id || !body.event_type) return json({ error: 'publication_id and event_type required' }, 400);
+      if (!['view', 'read', 'completion', 'share'].includes(body.event_type)) return json({ error: 'event_type must be view, read, completion, or share' }, 400);
+
+      const today = new Date().toISOString().split('T')[0];
+      const pub = await env.DB.prepare('SELECT id FROM roadbook_publications WHERE id = ?').bind(body.publication_id).first();
+      if (!pub) return json({ error: 'Publication not found' }, 404);
+
+      // Upsert daily analytics row
+      let row = await env.DB.prepare('SELECT * FROM rb_pub_analytics WHERE publication_id = ? AND event_date = ?').bind(body.publication_id, today).first();
+      if (!row) {
+        const id = crypto.randomUUID();
+        await env.DB.prepare('INSERT INTO rb_pub_analytics (id, publication_id, event_date) VALUES (?, ?, ?)').bind(id, body.publication_id, today).run();
+        row = { id };
+      }
+
+      const colMap = { view: 'views', read: 'reads', completion: 'completions', share: 'shares' };
+      const col = colMap[body.event_type];
+      await env.DB.prepare(`UPDATE rb_pub_analytics SET ${col} = ${col} + 1 WHERE publication_id = ? AND event_date = ?`).bind(body.publication_id, today).run();
+
+      // Track share platform
+      if (body.event_type === 'share') {
+        const shareId = crypto.randomUUID();
+        await env.DB.prepare('INSERT INTO rb_share_events (id, publication_id, user_id, platform, referrer) VALUES (?, ?, ?, ?, ?)')
+          .bind(shareId, body.publication_id, body.user_id || null, body.platform || 'link', body.referrer || null).run();
+      }
+
+      // Track referrer
+      if (body.referrer) {
+        const existing = await env.DB.prepare('SELECT referrers FROM rb_pub_analytics WHERE publication_id = ? AND event_date = ?').bind(body.publication_id, today).first();
+        let referrers = {};
+        try { referrers = JSON.parse(existing.referrers || '{}'); } catch {}
+        referrers[body.referrer] = (referrers[body.referrer] || 0) + 1;
+        await env.DB.prepare('UPDATE rb_pub_analytics SET referrers = ? WHERE publication_id = ? AND event_date = ?')
+          .bind(JSON.stringify(referrers), body.publication_id, today).run();
+      }
+
+      return json({ ok: true, event_type: body.event_type, date: today }, 201);
+    }
+
+    // Get per-article analytics
+    if (path === '/api/pub-analytics' && method === 'GET') {
+      const pubId = url.searchParams.get('publication_id');
+      const period = parseInt(url.searchParams.get('period') || '30');
+      const daysAgo = `-${period} days`;
+
+      if (pubId) {
+        // Single article analytics
+        const pub = await env.DB.prepare('SELECT id, title, reads, reading_time FROM roadbook_publications WHERE id = ?').bind(pubId).first();
+        if (!pub) return json({ error: 'Publication not found' }, 404);
+
+        const daily = await env.DB.prepare(
+          "SELECT * FROM rb_pub_analytics WHERE publication_id = ? AND event_date >= date('now', ?) ORDER BY event_date DESC"
+        ).bind(pubId, daysAgo).all();
+
+        const totals = await env.DB.prepare(
+          "SELECT SUM(views) as total_views, SUM(reads) as total_reads, SUM(completions) as total_completions, SUM(shares) as total_shares FROM rb_pub_analytics WHERE publication_id = ? AND event_date >= date('now', ?)"
+        ).bind(pubId, daysAgo).first();
+
+        const topReferrers = await env.DB.prepare(
+          "SELECT referrer, COUNT(*) as count FROM rb_share_events WHERE publication_id = ? AND created_at >= datetime('now', ?) AND referrer IS NOT NULL GROUP BY referrer ORDER BY count DESC LIMIT 10"
+        ).bind(pubId, daysAgo).all();
+
+        const completionRate = (totals?.total_reads || 0) > 0
+          ? Math.round(((totals?.total_completions || 0) / totals.total_reads) * 100)
+          : 0;
+
+        return json({
+          publication_id: pubId,
+          title: pub.title,
+          period_days: period,
+          totals: {
+            views: totals?.total_views || 0,
+            reads: totals?.total_reads || 0,
+            completions: totals?.total_completions || 0,
+            shares: totals?.total_shares || 0,
+            completion_rate: completionRate,
+          },
+          daily: daily.results || [],
+          top_referrers: topReferrers.results || [],
+        });
+      }
+
+      // Overview of all articles
+      const topArticles = await env.DB.prepare(
+        `SELECT p.id, p.title, p.category, p.reads,
+                SUM(pa.views) as period_views, SUM(pa.reads) as period_reads,
+                SUM(pa.completions) as period_completions, SUM(pa.shares) as period_shares
+         FROM roadbook_publications p
+         LEFT JOIN rb_pub_analytics pa ON pa.publication_id = p.id AND pa.event_date >= date('now', ?)
+         GROUP BY p.id
+         ORDER BY period_views DESC
+         LIMIT 30`
+      ).bind(daysAgo).all();
+
+      return json({ period_days: period, articles: topArticles.results || [] });
+    }
+
+    // Share tracking endpoint
+    if (path === '/api/pub-analytics/shares' && method === 'GET') {
+      const pubId = url.searchParams.get('publication_id');
+      if (!pubId) return json({ error: 'publication_id required' }, 400);
+      const result = await env.DB.prepare(
+        'SELECT platform, COUNT(*) as count FROM rb_share_events WHERE publication_id = ? GROUP BY platform ORDER BY count DESC'
+      ).bind(pubId).all();
+      const total = await env.DB.prepare('SELECT COUNT(*) as count FROM rb_share_events WHERE publication_id = ?').bind(pubId).first();
+      return json({ publication_id: pubId, total_shares: total?.count || 0, by_platform: result.results || [] });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ─── FEATURE 11: Content Licensing (/api/licensing) ───
+    // ═══════════════════════════════════════════════════════════════
+
+    // List licenses
+    if (path === '/api/licensing' && method === 'GET') {
+      const pubId = url.searchParams.get('publication_id');
+      const status = url.searchParams.get('status');
+      let query = 'SELECT l.*, p.title as publication_title, p.author FROM rb_licenses l JOIN roadbook_publications p ON p.id = l.publication_id WHERE 1=1';
+      const params = [];
+      if (pubId) { query += ' AND l.publication_id = ?'; params.push(pubId); }
+      if (status) { query += ' AND l.status = ?'; params.push(status); }
+      query += ' ORDER BY l.created_at DESC LIMIT 50';
+      const result = await env.DB.prepare(query).bind(...params).all();
+      return json({ licenses: result.results || [] });
+    }
+
+    // Request a license
+    if (path === '/api/licensing' && method === 'POST') {
+      const body = await request.json();
+      if (!body.publication_id || !body.licensee_name) return json({ error: 'publication_id and licensee_name required' }, 400);
+      const pub = await env.DB.prepare('SELECT id, title, license FROM roadbook_publications WHERE id = ?').bind(body.publication_id).first();
+      if (!pub) return json({ error: 'Publication not found' }, 404);
+      const id = crypto.randomUUID();
+      const licenseType = body.license_type || 'standard';
+      if (!['standard', 'exclusive', 'non_exclusive', 'academic', 'educational'].includes(licenseType)) {
+        return json({ error: 'license_type must be standard, exclusive, non_exclusive, academic, or educational' }, 400);
+      }
+      await env.DB.prepare(
+        'INSERT INTO rb_licenses (id, publication_id, license_type, licensee_name, licensee_email, terms, fee, currency, status, royalty_pct, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+      ).bind(id, body.publication_id, licenseType, body.licensee_name, body.licensee_email || '', body.terms || '', body.fee || 0, body.currency || 'USD', 'pending', body.royalty_pct || 0, body.expires_at || null).run();
+      return json({ ok: true, license_id: id, publication: pub.title, status: 'pending' }, 201);
+    }
+
+    const licenseMatch = path.match(/^\/api\/licensing\/([^/]+)$/);
+    const licenseApproveMatch = path.match(/^\/api\/licensing\/([^/]+)\/approve$/);
+    const licenseRoyaltyMatch = path.match(/^\/api\/licensing\/([^/]+)\/royalty$/);
+
+    // Get license details
+    if (licenseMatch && method === 'GET') {
+      const lic = await env.DB.prepare('SELECT l.*, p.title as publication_title FROM rb_licenses l JOIN roadbook_publications p ON p.id = l.publication_id WHERE l.id = ?').bind(licenseMatch[1]).first();
+      if (!lic) return json({ error: 'License not found' }, 404);
+      const payments = await env.DB.prepare('SELECT * FROM rb_royalty_payments WHERE license_id = ? ORDER BY created_at DESC').bind(licenseMatch[1]).all();
+      return json({ license: lic, royalty_payments: payments.results || [] });
+    }
+
+    // Approve/reject license
+    if (licenseApproveMatch && method === 'POST') {
+      const body = await request.json();
+      if (!body.action) return json({ error: 'action required (approve or reject)' }, 400);
+      if (!['approve', 'reject'].includes(body.action)) return json({ error: 'action must be approve or reject' }, 400);
+      const lic = await env.DB.prepare('SELECT id, status FROM rb_licenses WHERE id = ?').bind(licenseApproveMatch[1]).first();
+      if (!lic) return json({ error: 'License not found' }, 404);
+      if (lic.status !== 'pending') return json({ error: 'License is not pending' }, 400);
+      const newStatus = body.action === 'approve' ? 'active' : 'rejected';
+      await env.DB.prepare(
+        "UPDATE rb_licenses SET status = ?, granted_at = CASE WHEN ? = 'active' THEN datetime('now') ELSE granted_at END, updated_at = datetime('now') WHERE id = ?"
+      ).bind(newStatus, newStatus, licenseApproveMatch[1]).run();
+      return json({ ok: true, license_id: licenseApproveMatch[1], status: newStatus });
+    }
+
+    // Record royalty payment
+    if (licenseRoyaltyMatch && method === 'POST') {
+      const body = await request.json();
+      if (!body.amount) return json({ error: 'amount required' }, 400);
+      const lic = await env.DB.prepare('SELECT id, status FROM rb_licenses WHERE id = ?').bind(licenseRoyaltyMatch[1]).first();
+      if (!lic) return json({ error: 'License not found' }, 404);
+      const id = crypto.randomUUID();
+      await env.DB.prepare(
+        'INSERT INTO rb_royalty_payments (id, license_id, amount, period_start, period_end, status, paid_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
+      ).bind(id, licenseRoyaltyMatch[1], body.amount, body.period_start || null, body.period_end || null, body.status || 'paid', body.paid_at || new Date().toISOString()).run();
+      await env.DB.prepare(
+        "UPDATE rb_licenses SET total_royalties_paid = total_royalties_paid + ?, updated_at = datetime('now') WHERE id = ?"
+      ).bind(body.amount, licenseRoyaltyMatch[1]).run();
+      return json({ ok: true, payment_id: id, amount: body.amount }, 201);
+    }
+
+    // Licensing stats
+    if (path === '/api/licensing/stats' && method === 'GET') {
+      const totalLicenses = await env.DB.prepare('SELECT COUNT(*) as count FROM rb_licenses').first();
+      const activeLicenses = await env.DB.prepare("SELECT COUNT(*) as count FROM rb_licenses WHERE status = 'active'").first();
+      const totalRevenue = await env.DB.prepare('SELECT COALESCE(SUM(fee), 0) as total FROM rb_licenses WHERE status = ?').bind('active').first();
+      const totalRoyalties = await env.DB.prepare('SELECT COALESCE(SUM(amount), 0) as total FROM rb_royalty_payments').first();
+      const byType = await env.DB.prepare('SELECT license_type, COUNT(*) as count FROM rb_licenses GROUP BY license_type').all();
+      return json({
+        total_licenses: totalLicenses?.count || 0,
+        active_licenses: activeLicenses?.count || 0,
+        total_licensing_revenue: totalRevenue?.total || 0,
+        total_royalties_paid: totalRoyalties?.total || 0,
+        by_type: byType.results || [],
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ─── FEATURE 12: Book Clubs (/api/clubs) ───
+    // ═══════════════════════════════════════════════════════════════
+
+    // List clubs
+    if (path === '/api/clubs' && method === 'GET') {
+      const q = url.searchParams.get('q');
+      let query = `SELECT c.*,
+                   (SELECT COUNT(*) FROM rb_club_members cm WHERE cm.club_id = c.id) as actual_members,
+                   (SELECT COUNT(*) FROM rb_club_discussions cd WHERE cd.club_id = c.id) as discussion_count
+                   FROM rb_clubs c`;
+      const params = [];
+      if (q) { query += ' WHERE c.name LIKE ? OR c.description LIKE ?'; params.push(`%${q}%`, `%${q}%`); }
+      query += ' ORDER BY c.member_count DESC, c.created_at DESC LIMIT 50';
+      const result = await env.DB.prepare(query).bind(...params).all();
+      return json({ clubs: result.results || [] });
+    }
+
+    // Create club
+    if (path === '/api/clubs' && method === 'POST') {
+      const body = await request.json();
+      if (!body.name) return json({ error: 'name required' }, 400);
+      const id = crypto.randomUUID();
+      await env.DB.prepare(
+        'INSERT INTO rb_clubs (id, name, description, creator, club_type, visibility, reading_list, discussion_schedule) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+      ).bind(id, body.name, body.description || '', body.creator || 'blackroad', body.club_type || 'book', body.visibility || 'public', JSON.stringify(body.reading_list || []), body.discussion_schedule || null).run();
+      // Auto-add creator as admin member
+      await env.DB.prepare('INSERT INTO rb_club_members (id, club_id, user_id, role) VALUES (?, ?, ?, ?)')
+        .bind(crypto.randomUUID(), id, body.creator || 'blackroad', 'admin').run();
+      await env.DB.prepare('UPDATE rb_clubs SET member_count = 1 WHERE id = ?').bind(id).run();
+      const club = await env.DB.prepare('SELECT * FROM rb_clubs WHERE id = ?').bind(id).first();
+      return json({ club }, 201);
+    }
+
+    const clubMatch = path.match(/^\/api\/clubs\/([^/]+)$/);
+    const clubJoinMatch = path.match(/^\/api\/clubs\/([^/]+)\/join$/);
+    const clubReadingListMatch = path.match(/^\/api\/clubs\/([^/]+)\/reading-list$/);
+    const clubDiscussionsMatch = path.match(/^\/api\/clubs\/([^/]+)\/discussions$/);
+    const clubDiscussionReplyMatch = path.match(/^\/api\/clubs\/([^/]+)\/discussions\/([^/]+)\/reply$/);
+
+    // Get single club
+    if (clubMatch && method === 'GET') {
+      const club = await env.DB.prepare('SELECT * FROM rb_clubs WHERE id = ?').bind(clubMatch[1]).first();
+      if (!club) return json({ error: 'Club not found' }, 404);
+      const members = await env.DB.prepare('SELECT * FROM rb_club_members WHERE club_id = ? ORDER BY joined_at ASC').bind(clubMatch[1]).all();
+      const discussions = await env.DB.prepare(
+        'SELECT d.*, (SELECT COUNT(*) FROM rb_club_discussion_replies r WHERE r.discussion_id = d.id) as reply_count FROM rb_club_discussions d WHERE d.club_id = ? ORDER BY d.created_at DESC LIMIT 20'
+      ).bind(clubMatch[1]).all();
+      // Resolve reading list publication details
+      let readingList = [];
+      try {
+        const ids = JSON.parse(club.reading_list || '[]');
+        if (ids.length) {
+          const placeholders = ids.map(() => '?').join(',');
+          const pubs = await env.DB.prepare(`SELECT id, title, summary, category, reading_time, author FROM roadbook_publications WHERE id IN (${placeholders})`).bind(...ids).all();
+          readingList = pubs.results || [];
+        }
+      } catch {}
+      return json({ club, members: members.results || [], discussions: discussions.results || [], reading_list_details: readingList });
+    }
+
+    // Update club
+    if (clubMatch && method === 'PUT') {
+      const club = await env.DB.prepare('SELECT id FROM rb_clubs WHERE id = ?').bind(clubMatch[1]).first();
+      if (!club) return json({ error: 'Club not found' }, 404);
+      const body = await request.json();
+      await env.DB.prepare(
+        "UPDATE rb_clubs SET name = COALESCE(?, name), description = COALESCE(?, description), current_reading_id = COALESCE(?, current_reading_id), discussion_schedule = COALESCE(?, discussion_schedule), updated_at = datetime('now') WHERE id = ?"
+      ).bind(body.name || null, body.description || null, body.current_reading_id || null, body.discussion_schedule || null, clubMatch[1]).run();
+      const updated = await env.DB.prepare('SELECT * FROM rb_clubs WHERE id = ?').bind(clubMatch[1]).first();
+      return json({ club: updated });
+    }
+
+    // Join club
+    if (clubJoinMatch && method === 'POST') {
+      const body = await request.json();
+      if (!body.user_id) return json({ error: 'user_id required' }, 400);
+      const club = await env.DB.prepare('SELECT id FROM rb_clubs WHERE id = ?').bind(clubJoinMatch[1]).first();
+      if (!club) return json({ error: 'Club not found' }, 404);
+      const existing = await env.DB.prepare('SELECT id FROM rb_club_members WHERE club_id = ? AND user_id = ?').bind(clubJoinMatch[1], body.user_id).first();
+      if (existing) return json({ error: 'Already a member' }, 409);
+      const id = crypto.randomUUID();
+      await env.DB.prepare('INSERT INTO rb_club_members (id, club_id, user_id, role) VALUES (?, ?, ?, ?)').bind(id, clubJoinMatch[1], body.user_id, 'member').run();
+      await env.DB.prepare('UPDATE rb_clubs SET member_count = member_count + 1 WHERE id = ?').bind(clubJoinMatch[1]).run();
+      return json({ ok: true, member_id: id }, 201);
+    }
+
+    // Manage reading list
+    if (clubReadingListMatch && method === 'POST') {
+      const body = await request.json();
+      if (!body.publication_id) return json({ error: 'publication_id required' }, 400);
+      const club = await env.DB.prepare('SELECT id, reading_list FROM rb_clubs WHERE id = ?').bind(clubReadingListMatch[1]).first();
+      if (!club) return json({ error: 'Club not found' }, 404);
+      const pub = await env.DB.prepare('SELECT id, title FROM roadbook_publications WHERE id = ?').bind(body.publication_id).first();
+      if (!pub) return json({ error: 'Publication not found' }, 404);
+      let list = [];
+      try { list = JSON.parse(club.reading_list || '[]'); } catch {}
+      if (body.action === 'remove') {
+        list = list.filter(id => id !== body.publication_id);
+      } else {
+        if (!list.includes(body.publication_id)) list.push(body.publication_id);
+      }
+      await env.DB.prepare("UPDATE rb_clubs SET reading_list = ?, updated_at = datetime('now') WHERE id = ?").bind(JSON.stringify(list), clubReadingListMatch[1]).run();
+      return json({ ok: true, reading_list: list, count: list.length });
+    }
+
+    if (clubReadingListMatch && method === 'GET') {
+      const club = await env.DB.prepare('SELECT id, reading_list FROM rb_clubs WHERE id = ?').bind(clubReadingListMatch[1]).first();
+      if (!club) return json({ error: 'Club not found' }, 404);
+      let readingList = [];
+      try {
+        const ids = JSON.parse(club.reading_list || '[]');
+        if (ids.length) {
+          const placeholders = ids.map(() => '?').join(',');
+          const pubs = await env.DB.prepare(`SELECT id, title, summary, category, reading_time, author, doi FROM roadbook_publications WHERE id IN (${placeholders})`).bind(...ids).all();
+          readingList = pubs.results || [];
+        }
+      } catch {}
+      return json({ club_id: clubReadingListMatch[1], reading_list: readingList });
+    }
+
+    // Create discussion
+    if (clubDiscussionsMatch && method === 'POST') {
+      const body = await request.json();
+      if (!body.topic || !body.author) return json({ error: 'topic and author required' }, 400);
+      const club = await env.DB.prepare('SELECT id FROM rb_clubs WHERE id = ?').bind(clubDiscussionsMatch[1]).first();
+      if (!club) return json({ error: 'Club not found' }, 404);
+      const id = crypto.randomUUID();
+      await env.DB.prepare(
+        'INSERT INTO rb_club_discussions (id, club_id, publication_id, topic, body, author, scheduled_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
+      ).bind(id, clubDiscussionsMatch[1], body.publication_id || null, body.topic, body.body || '', body.author, body.scheduled_at || null).run();
+      return json({ ok: true, discussion_id: id }, 201);
+    }
+
+    if (clubDiscussionsMatch && method === 'GET') {
+      const result = await env.DB.prepare(
+        `SELECT d.*, p.title as publication_title,
+                (SELECT COUNT(*) FROM rb_club_discussion_replies r WHERE r.discussion_id = d.id) as reply_count
+         FROM rb_club_discussions d
+         LEFT JOIN roadbook_publications p ON p.id = d.publication_id
+         WHERE d.club_id = ?
+         ORDER BY d.created_at DESC LIMIT 50`
+      ).bind(clubDiscussionsMatch[1]).all();
+      return json({ club_id: clubDiscussionsMatch[1], discussions: result.results || [] });
+    }
+
+    // Reply to discussion
+    if (clubDiscussionReplyMatch && method === 'POST') {
+      const body = await request.json();
+      if (!body.author || !body.body) return json({ error: 'author and body required' }, 400);
+      const discussion = await env.DB.prepare('SELECT id FROM rb_club_discussions WHERE id = ? AND club_id = ?').bind(clubDiscussionReplyMatch[2], clubDiscussionReplyMatch[1]).first();
+      if (!discussion) return json({ error: 'Discussion not found' }, 404);
+      const id = crypto.randomUUID();
+      await env.DB.prepare('INSERT INTO rb_club_discussion_replies (id, discussion_id, author, body) VALUES (?, ?, ?, ?)').bind(id, clubDiscussionReplyMatch[2], body.author, body.body.slice(0, 5000)).run();
+      await env.DB.prepare('UPDATE rb_club_discussions SET replies_count = replies_count + 1 WHERE id = ?').bind(clubDiscussionReplyMatch[2]).run();
+      return json({ ok: true, reply_id: id }, 201);
+    }
+
+    // Get discussion with replies
+    const clubDiscussionDetailMatch = path.match(/^\/api\/clubs\/([^/]+)\/discussions\/([^/]+)$/);
+    if (clubDiscussionDetailMatch && method === 'GET') {
+      const discussion = await env.DB.prepare('SELECT * FROM rb_club_discussions WHERE id = ? AND club_id = ?').bind(clubDiscussionDetailMatch[2], clubDiscussionDetailMatch[1]).first();
+      if (!discussion) return json({ error: 'Discussion not found' }, 404);
+      const replies = await env.DB.prepare('SELECT * FROM rb_club_discussion_replies WHERE discussion_id = ? ORDER BY created_at ASC').bind(clubDiscussionDetailMatch[2]).all();
+      return json({ discussion, replies: replies.results || [] });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ─── FEATURE 13: Translation (/api/translate) ───
+    // ═══════════════════════════════════════════════════════════════
+
+    const LANGUAGES = {
+      es: 'Spanish', fr: 'French', de: 'German', pt: 'Portuguese', it: 'Italian',
+      ja: 'Japanese', ko: 'Korean', zh: 'Chinese', ar: 'Arabic', hi: 'Hindi',
+      ru: 'Russian', nl: 'Dutch', sv: 'Swedish', pl: 'Polish', tr: 'Turkish',
+    };
+
+    // List translations for an article
+    if (path === '/api/translate' && method === 'GET') {
+      const pubId = url.searchParams.get('publication_id');
+      const lang = url.searchParams.get('language');
+      if (!pubId) return json({ error: 'publication_id required' }, 400);
+      let query = 'SELECT t.*, p.title as original_title FROM rb_translations t JOIN roadbook_publications p ON p.id = t.publication_id WHERE t.publication_id = ?';
+      const params = [pubId];
+      if (lang) { query += ' AND t.language = ?'; params.push(lang); }
+      query += ' ORDER BY t.language ASC';
+      const result = await env.DB.prepare(query).bind(...params).all();
+      return json({ publication_id: pubId, translations: result.results || [], supported_languages: LANGUAGES });
+    }
+
+    // Translate an article
+    if (path === '/api/translate' && method === 'POST') {
+      const body = await request.json();
+      if (!body.publication_id || !body.language) return json({ error: 'publication_id and language required' }, 400);
+      if (!LANGUAGES[body.language]) return json({ error: `Unsupported language. Supported: ${Object.keys(LANGUAGES).join(', ')}` }, 400);
+
+      const pub = await env.DB.prepare('SELECT * FROM roadbook_publications WHERE id = ?').bind(body.publication_id).first();
+      if (!pub) return json({ error: 'Publication not found' }, 404);
+
+      // Check existing translation
+      const existing = await env.DB.prepare('SELECT id FROM rb_translations WHERE publication_id = ? AND language = ?').bind(body.publication_id, body.language).first();
+      if (existing && !body.force) return json({ error: 'Translation already exists. Use force: true to overwrite.' }, 409);
+
+      const langName = LANGUAGES[body.language];
+
+      try {
+        // Translate title
+        const titleResult = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+          messages: [
+            { role: 'system', content: `You are a professional translator. Translate the following title to ${langName}. Return ONLY the translated title, nothing else.` },
+            { role: 'user', content: pub.title },
+          ],
+          max_tokens: 200,
+        });
+
+        // Translate content in chunks if needed
+        const contentChunks = [];
+        const chunkSize = 3000;
+        for (let i = 0; i < pub.content.length; i += chunkSize) {
+          contentChunks.push(pub.content.substring(i, i + chunkSize));
+        }
+
+        let translatedContent = '';
+        for (const chunk of contentChunks.slice(0, 10)) { // Max 10 chunks
+          const chunkResult = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+            messages: [
+              { role: 'system', content: `You are a professional translator. Translate the following text to ${langName}. Preserve all formatting (markdown, headings, lists). Return ONLY the translation.` },
+              { role: 'user', content: chunk },
+            ],
+            max_tokens: 4000,
+          });
+          translatedContent += (chunkResult.response || chunk) + '\n';
+        }
+
+        // Translate summary
+        let translatedSummary = '';
+        if (pub.summary) {
+          const summaryResult = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+            messages: [
+              { role: 'system', content: `Translate to ${langName}. Return ONLY the translation.` },
+              { role: 'user', content: pub.summary },
+            ],
+            max_tokens: 300,
+          });
+          translatedSummary = summaryResult.response || '';
+        }
+
+        const id = existing ? existing.id : crypto.randomUUID();
+        if (existing) {
+          await env.DB.prepare(
+            "UPDATE rb_translations SET translated_title = ?, translated_content = ?, translated_summary = ?, status = 'completed', updated_at = datetime('now') WHERE id = ?"
+          ).bind(titleResult.response?.trim() || pub.title, translatedContent.trim(), translatedSummary.trim(), id).run();
+        } else {
+          await env.DB.prepare(
+            'INSERT INTO rb_translations (id, publication_id, language, language_name, translated_title, translated_content, translated_summary, translator, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+          ).bind(id, body.publication_id, body.language, langName, titleResult.response?.trim() || pub.title, translatedContent.trim(), translatedSummary.trim(), 'ai', 'completed').run();
+        }
+
+        const translation = await env.DB.prepare('SELECT * FROM rb_translations WHERE id = ?').bind(id).first();
+        return json({ ok: true, translation, agent: 'AI Translator' }, 201);
+      } catch (e) {
+        return json({ error: 'Translation failed: ' + (e.message || 'AI unavailable'), publication_id: body.publication_id, language: body.language }, 500);
+      }
+    }
+
+    // Get specific translation
+    const translateMatch = path.match(/^\/api\/translate\/([^/]+)$/);
+    if (translateMatch && method === 'GET') {
+      const trans = await env.DB.prepare('SELECT t.*, p.title as original_title, p.content as original_content FROM rb_translations t JOIN roadbook_publications p ON p.id = t.publication_id WHERE t.id = ?').bind(translateMatch[1]).first();
+      if (!trans) return json({ error: 'Translation not found' }, 404);
+      return json({ translation: trans });
+    }
+
+    // Delete translation
+    if (translateMatch && method === 'DELETE') {
+      const trans = await env.DB.prepare('SELECT id FROM rb_translations WHERE id = ?').bind(translateMatch[1]).first();
+      if (!trans) return json({ error: 'Translation not found' }, 404);
+      await env.DB.prepare('DELETE FROM rb_translations WHERE id = ?').bind(translateMatch[1]).run();
+      return json({ ok: true, deleted: translateMatch[1] });
+    }
+
+    // Available languages
+    if (path === '/api/translate/languages' && method === 'GET') {
+      return json({ languages: LANGUAGES });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ─── FEATURE 14: Podcast Integration (/api/podcast) ───
+    // ═══════════════════════════════════════════════════════════════
+
+    // List podcast episodes
+    if (path === '/api/podcast' && method === 'GET') {
+      const status = url.searchParams.get('status');
+      let query = 'SELECT pod.*, p.title as article_title, p.category, p.author, p.reading_time FROM rb_podcasts pod JOIN roadbook_publications p ON p.id = pod.publication_id';
+      const params = [];
+      if (status) { query += ' WHERE pod.status = ?'; params.push(status); }
+      query += ' ORDER BY pod.episode_number DESC, pod.created_at DESC LIMIT 50';
+      const result = await env.DB.prepare(query).bind(...params).all();
+      return json({ episodes: result.results || [] });
+    }
+
+    // Create podcast episode from article
+    if (path === '/api/podcast' && method === 'POST') {
+      const body = await request.json();
+      if (!body.publication_id) return json({ error: 'publication_id required' }, 400);
+      const pub = await env.DB.prepare('SELECT * FROM roadbook_publications WHERE id = ?').bind(body.publication_id).first();
+      if (!pub) return json({ error: 'Publication not found' }, 404);
+
+      // Check for existing episode
+      const existing = await env.DB.prepare('SELECT id FROM rb_podcasts WHERE publication_id = ?').bind(body.publication_id).first();
+      if (existing && !body.force) return json({ error: 'Episode already exists for this article. Use force: true to recreate.' }, 409);
+
+      // Estimate audio duration (avg speaking rate ~150 words/min)
+      const wordCount = pub.content.split(/\s+/).length;
+      const durationSeconds = Math.ceil((wordCount / 150) * 60);
+
+      // Get next episode number
+      const lastEp = await env.DB.prepare('SELECT MAX(episode_number) as max_ep FROM rb_podcasts WHERE season = ?').bind(body.season || 1).first();
+      const episodeNumber = body.episode_number || ((lastEp?.max_ep || 0) + 1);
+
+      // Generate narration-ready transcript with AI
+      let transcript = '';
+      try {
+        const aiResult = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+          messages: [
+            { role: 'system', content: `${AGENTS.calliope.prompt} Convert this article into a podcast narration script. Add natural introductions, transitions, and conclusions. Make it conversational while preserving key information. Include [PAUSE] markers where natural breaks should occur. Return ONLY the narration script.` },
+            { role: 'user', content: `Title: ${pub.title}\nBy: ${pub.author}\n\n${pub.content.substring(0, 6000)}` },
+          ],
+          max_tokens: 4000,
+        });
+        transcript = aiResult.response || pub.content;
+      } catch {
+        transcript = `Welcome to RoadBook Audio. Today's article: "${pub.title}" by ${pub.author}.\n\n${pub.content}`;
+      }
+
+      // Generate episode description
+      let description = body.description || '';
+      if (!description) {
+        description = `Listen to "${pub.title}" by ${pub.author}. ${pub.summary || ''} Duration: approximately ${Math.ceil(durationSeconds / 60)} minutes.`;
+      }
+
+      const id = existing ? existing.id : crypto.randomUUID();
+      if (existing) {
+        await env.DB.prepare(
+          "UPDATE rb_podcasts SET title = ?, description = ?, narrator = ?, duration_seconds = ?, audio_url = ?, status = ?, episode_number = ?, season = ?, transcript = ?, updated_at = datetime('now') WHERE id = ?"
+        ).bind(body.title || pub.title, description, body.narrator || 'ai', durationSeconds, body.audio_url || null, 'ready', episodeNumber, body.season || 1, transcript, id).run();
+      } else {
+        await env.DB.prepare(
+          'INSERT INTO rb_podcasts (id, publication_id, title, description, narrator, duration_seconds, audio_url, status, episode_number, season, transcript) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        ).bind(id, body.publication_id, body.title || pub.title, description, body.narrator || 'ai', durationSeconds, body.audio_url || null, 'ready', episodeNumber, body.season || 1, transcript).run();
+      }
+
+      const episode = await env.DB.prepare('SELECT * FROM rb_podcasts WHERE id = ?').bind(id).first();
+      return json({ episode, agent: 'Calliope' }, 201);
+    }
+
+    const podcastMatch = path.match(/^\/api\/podcast\/([^/]+)$/);
+
+    // Get single episode
+    if (podcastMatch && method === 'GET') {
+      const ep = await env.DB.prepare('SELECT pod.*, p.title as article_title, p.content as article_content, p.author, p.doi FROM rb_podcasts pod JOIN roadbook_publications p ON p.id = pod.publication_id WHERE pod.id = ?').bind(podcastMatch[1]).first();
+      if (!ep) return json({ error: 'Episode not found' }, 404);
+      return json({ episode: ep });
+    }
+
+    // Update episode (e.g., add audio URL after recording)
+    if (podcastMatch && method === 'PUT') {
+      const ep = await env.DB.prepare('SELECT id FROM rb_podcasts WHERE id = ?').bind(podcastMatch[1]).first();
+      if (!ep) return json({ error: 'Episode not found' }, 404);
+      const body = await request.json();
+      await env.DB.prepare(
+        "UPDATE rb_podcasts SET audio_url = COALESCE(?, audio_url), status = COALESCE(?, status), narrator = COALESCE(?, narrator), updated_at = datetime('now') WHERE id = ?"
+      ).bind(body.audio_url || null, body.status || null, body.narrator || null, podcastMatch[1]).run();
+      const updated = await env.DB.prepare('SELECT * FROM rb_podcasts WHERE id = ?').bind(podcastMatch[1]).first();
+      return json({ episode: updated });
+    }
+
+    // Generate RSS feed
+    if (path === '/api/podcast/feed' && method === 'GET') {
+      const episodes = await env.DB.prepare(
+        "SELECT pod.*, p.title as article_title, p.author, p.summary as article_summary FROM rb_podcasts pod JOIN roadbook_publications p ON p.id = pod.publication_id WHERE pod.status IN ('ready', 'published') ORDER BY pod.episode_number DESC LIMIT 100"
+      ).all();
+
+      const items = (episodes.results || []).map(ep => `
+    <item>
+      <title>${ep.title.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</title>
+      <description>${(ep.description || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')}</description>
+      <pubDate>${new Date(ep.created_at).toUTCString()}</pubDate>
+      <guid>https://roadbook.blackroad.io/api/podcast/${ep.id}</guid>
+      ${ep.audio_url ? `<enclosure url="${ep.audio_url}" type="audio/mpeg" length="${ep.duration_seconds * 16000}"/>` : ''}
+      <itunes:duration>${Math.floor(ep.duration_seconds / 60)}:${String(ep.duration_seconds % 60).padStart(2, '0')}</itunes:duration>
+      <itunes:episode>${ep.episode_number || 1}</itunes:episode>
+      <itunes:season>${ep.season || 1}</itunes:season>
+      <itunes:author>${ep.article_title ? ep.article_title.replace(/&/g, '&amp;') : 'BlackRoad OS'}</itunes:author>
+    </item>`).join('');
+
+      const rss = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>RoadBook Audio - BlackRoad OS</title>
+    <link>https://roadbook.blackroad.io</link>
+    <description>Articles from RoadBook, narrated. AI, sovereignty, education, and knowledge preservation.</description>
+    <language>en</language>
+    <itunes:author>BlackRoad OS</itunes:author>
+    <itunes:category text="Technology"/>
+    <itunes:image href="https://images.blackroad.io/pixel-art/road-logo.png"/>
+    <atom:link href="https://roadbook.blackroad.io/api/podcast/feed" rel="self" type="application/rss+xml"/>
+    ${items}
+  </channel>
+</rss>`;
+
+      return new Response(rss, { status: 200, headers: { ...CORS, 'Content-Type': 'application/rss+xml; charset=utf-8' } });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ─── FEATURE 15: Academic Citations (/api/academic) ───
+    // ═══════════════════════════════════════════════════════════════
+
+    // List bibliographies for a user
+    if (path === '/api/academic' && method === 'GET') {
+      const userId = url.searchParams.get('user_id');
+      if (!userId) return json({ error: 'user_id required' }, 400);
+      const result = await env.DB.prepare('SELECT * FROM rb_bibliographies WHERE user_id = ? ORDER BY updated_at DESC').bind(userId).all();
+      return json({ bibliographies: result.results || [] });
+    }
+
+    // Create bibliography
+    if (path === '/api/academic' && method === 'POST') {
+      const body = await request.json();
+      if (!body.user_id || !body.name) return json({ error: 'user_id and name required' }, 400);
+      const id = crypto.randomUUID();
+      await env.DB.prepare(
+        'INSERT INTO rb_bibliographies (id, user_id, name, description, format) VALUES (?, ?, ?, ?, ?)'
+      ).bind(id, body.user_id, body.name, body.description || '', body.format || 'apa').run();
+      const bib = await env.DB.prepare('SELECT * FROM rb_bibliographies WHERE id = ?').bind(id).first();
+      return json({ bibliography: bib }, 201);
+    }
+
+    const academicMatch = path.match(/^\/api\/academic\/([^/]+)$/);
+    const academicEntriesMatch = path.match(/^\/api\/academic\/([^/]+)\/entries$/);
+    const academicGenerateMatch = path.match(/^\/api\/academic\/([^/]+)\/generate$/);
+
+    // Get bibliography with entries
+    if (academicMatch && method === 'GET') {
+      const bib = await env.DB.prepare('SELECT * FROM rb_bibliographies WHERE id = ?').bind(academicMatch[1]).first();
+      if (!bib) return json({ error: 'Bibliography not found' }, 404);
+      const entries = await env.DB.prepare(
+        'SELECT e.*, p.title as publication_title, p.author as publication_author, p.created_at as publication_date FROM rb_bibliography_entries e LEFT JOIN roadbook_publications p ON p.id = e.publication_id WHERE e.bibliography_id = ? ORDER BY e.sort_key ASC, e.created_at ASC'
+      ).bind(academicMatch[1]).all();
+      return json({ bibliography: bib, entries: entries.results || [] });
+    }
+
+    // Delete bibliography
+    if (academicMatch && method === 'DELETE') {
+      const bib = await env.DB.prepare('SELECT id FROM rb_bibliographies WHERE id = ?').bind(academicMatch[1]).first();
+      if (!bib) return json({ error: 'Bibliography not found' }, 404);
+      await env.DB.prepare('DELETE FROM rb_bibliography_entries WHERE bibliography_id = ?').bind(academicMatch[1]).run();
+      await env.DB.prepare('DELETE FROM rb_bibliographies WHERE id = ?').bind(academicMatch[1]).run();
+      return json({ ok: true, deleted: academicMatch[1] });
+    }
+
+    // Add entry to bibliography
+    if (academicEntriesMatch && method === 'POST') {
+      const body = await request.json();
+      const bib = await env.DB.prepare('SELECT * FROM rb_bibliographies WHERE id = ?').bind(academicEntriesMatch[1]).first();
+      if (!bib) return json({ error: 'Bibliography not found' }, 404);
+
+      const id = crypto.randomUUID();
+      let parsedData = {};
+      let rawCitation = body.raw_citation || '';
+      let sortKey = '';
+
+      if (body.publication_id) {
+        // Add from RoadBook publication
+        const pub = await env.DB.prepare('SELECT * FROM roadbook_publications WHERE id = ?').bind(body.publication_id).first();
+        if (!pub) return json({ error: 'Publication not found' }, 404);
+        const citations = generateCitations(pub);
+        rawCitation = citations[bib.format] || citations.apa;
+        parsedData = {
+          title: pub.title,
+          author: pub.author,
+          year: new Date(pub.created_at).getFullYear(),
+          doi: pub.doi || generateDOI(pub.id),
+          url: `https://roadbook.blackroad.io/api/publications/${pub.id}`,
+          publisher: 'RoadBook, BlackRoad OS',
+        };
+        sortKey = (pub.author || 'ZZZ').toLowerCase();
+      } else if (body.doi) {
+        // DOI lookup - generate citation from DOI
+        rawCitation = body.raw_citation || `DOI: ${body.doi}`;
+        parsedData = { doi: body.doi, ...body.parsed_data };
+        sortKey = (body.parsed_data?.author || 'ZZZ').toLowerCase();
+      } else if (body.raw_citation) {
+        // Manual citation entry - use AI to parse
+        try {
+          const aiResult = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+            messages: [
+              { role: 'system', content: `Parse this citation into structured data. Return JSON with fields: title, author, year, journal, volume, pages, doi, url, publisher. Return ONLY valid JSON.` },
+              { role: 'user', content: rawCitation },
+            ],
+            max_tokens: 300,
+          });
+          try {
+            parsedData = JSON.parse(aiResult.response);
+          } catch { parsedData = { raw: rawCitation }; }
+        } catch { parsedData = { raw: rawCitation }; }
+        sortKey = (parsedData.author || 'ZZZ').toLowerCase();
+      } else {
+        return json({ error: 'publication_id, doi, or raw_citation required' }, 400);
+      }
+
+      await env.DB.prepare(
+        'INSERT INTO rb_bibliography_entries (id, bibliography_id, publication_id, doi, raw_citation, parsed_data, entry_type, sort_key) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+      ).bind(id, academicEntriesMatch[1], body.publication_id || null, body.doi || parsedData.doi || null, rawCitation, JSON.stringify(parsedData), body.entry_type || 'article', sortKey).run();
+
+      // Update entry count
+      await env.DB.prepare(
+        "UPDATE rb_bibliographies SET entry_count = entry_count + 1, updated_at = datetime('now') WHERE id = ?"
+      ).bind(academicEntriesMatch[1]).run();
+
+      return json({ ok: true, entry_id: id, raw_citation: rawCitation, parsed_data: parsedData }, 201);
+    }
+
+    // Remove entry
+    if (academicEntriesMatch && method === 'DELETE') {
+      const body = await request.json();
+      if (!body.entry_id) return json({ error: 'entry_id required' }, 400);
+      await env.DB.prepare('DELETE FROM rb_bibliography_entries WHERE id = ? AND bibliography_id = ?').bind(body.entry_id, academicEntriesMatch[1]).run();
+      await env.DB.prepare(
+        "UPDATE rb_bibliographies SET entry_count = MAX(0, entry_count - 1), updated_at = datetime('now') WHERE id = ?"
+      ).bind(academicEntriesMatch[1]).run();
+      return json({ ok: true, deleted: body.entry_id });
+    }
+
+    // Generate formatted bibliography
+    if (academicGenerateMatch && method === 'GET') {
+      const bib = await env.DB.prepare('SELECT * FROM rb_bibliographies WHERE id = ?').bind(academicGenerateMatch[1]).first();
+      if (!bib) return json({ error: 'Bibliography not found' }, 404);
+      const format = url.searchParams.get('format') || bib.format || 'apa';
+      const entries = await env.DB.prepare(
+        'SELECT e.*, p.title as pub_title, p.author as pub_author, p.created_at as pub_date, p.doi as pub_doi FROM rb_bibliography_entries e LEFT JOIN roadbook_publications p ON p.id = e.publication_id WHERE e.bibliography_id = ? ORDER BY e.sort_key ASC, e.created_at ASC'
+      ).bind(academicGenerateMatch[1]).all();
+
+      const formattedEntries = (entries.results || []).map(entry => {
+        if (entry.publication_id && entry.pub_title) {
+          // Re-generate citation in requested format
+          const mockPub = { id: entry.publication_id, title: entry.pub_title, author: entry.pub_author, created_at: entry.pub_date, doi: entry.pub_doi || entry.doi };
+          const citations = generateCitations(mockPub);
+          return { entry_id: entry.id, citation: citations[format] || citations.apa, format };
+        }
+        return { entry_id: entry.id, citation: entry.raw_citation, format: 'raw' };
+      });
+
+      // Combine into full bibliography text
+      const bibText = formattedEntries.map((e, i) => `[${i + 1}] ${e.citation}`).join('\n\n');
+
+      return json({
+        bibliography_id: academicGenerateMatch[1],
+        name: bib.name,
+        format,
+        entry_count: formattedEntries.length,
+        entries: formattedEntries,
+        formatted_text: bibText,
+      });
+    }
+
+    // DOI lookup
+    if (path === '/api/academic/doi-lookup' && method === 'GET') {
+      const doi = url.searchParams.get('doi');
+      if (!doi) return json({ error: 'doi query param required' }, 400);
+
+      // Check if this DOI is a RoadBook DOI
+      if (doi.startsWith('10.blackroad/')) {
+        const pubIdFragment = doi.replace('10.blackroad/rb-', '');
+        const pubs = await env.DB.prepare("SELECT * FROM roadbook_publications WHERE doi = ? OR id LIKE ?").bind(doi, `${pubIdFragment}%`).all();
+        if (pubs.results && pubs.results.length > 0) {
+          const pub = pubs.results[0];
+          return json({
+            doi,
+            found: true,
+            source: 'roadbook',
+            publication: { id: pub.id, title: pub.title, author: pub.author, date: pub.created_at, doi: pub.doi },
+            citations: generateCitations(pub),
+          });
+        }
+      }
+
+      // External DOI - try to resolve via doi.org
+      try {
+        const resp = await fetch(`https://doi.org/${doi}`, { headers: { 'Accept': 'application/json' }, redirect: 'follow' });
+        if (resp.ok) {
+          const data = await resp.json();
+          return json({ doi, found: true, source: 'external', metadata: data });
+        }
+      } catch {}
+
+      return json({ doi, found: false, message: 'DOI not found or could not be resolved' });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ─── FEATURE 16: Content Syndication (/api/syndicate) ───
+    // ═══════════════════════════════════════════════════════════════
+
+    // List syndications
+    if (path === '/api/syndicate' && method === 'GET') {
+      const pubId = url.searchParams.get('publication_id');
+      const platform = url.searchParams.get('platform');
+      const status = url.searchParams.get('status');
+      let query = 'SELECT s.*, p.title as publication_title, p.author FROM rb_syndications s JOIN roadbook_publications p ON p.id = s.publication_id WHERE 1=1';
+      const params = [];
+      if (pubId) { query += ' AND s.publication_id = ?'; params.push(pubId); }
+      if (platform) { query += ' AND s.platform = ?'; params.push(platform); }
+      if (status) { query += ' AND s.status = ?'; params.push(status); }
+      query += ' ORDER BY s.created_at DESC LIMIT 50';
+      const result = await env.DB.prepare(query).bind(...params).all();
+      return json({ syndications: result.results || [] });
+    }
+
+    // Create syndication
+    if (path === '/api/syndicate' && method === 'POST') {
+      const body = await request.json();
+      if (!body.publication_id || !body.platform) return json({ error: 'publication_id and platform required' }, 400);
+      const pub = await env.DB.prepare('SELECT id, title, content, summary, author, doi FROM roadbook_publications WHERE id = ?').bind(body.publication_id).first();
+      if (!pub) return json({ error: 'Publication not found' }, 404);
+
+      const validPlatforms = ['medium', 'dev_to', 'hashnode', 'substack', 'linkedin', 'wordpress', 'ghost', 'custom'];
+      if (!validPlatforms.includes(body.platform)) {
+        return json({ error: `Platform must be one of: ${validPlatforms.join(', ')}` }, 400);
+      }
+
+      // Check for existing syndication
+      const existing = await env.DB.prepare('SELECT id FROM rb_syndications WHERE publication_id = ? AND platform = ?').bind(body.publication_id, body.platform).first();
+      if (existing && !body.force) return json({ error: 'Already syndicated to this platform. Use force: true to re-syndicate.' }, 409);
+
+      const id = existing ? existing.id : crypto.randomUUID();
+      if (existing) {
+        await env.DB.prepare(
+          "UPDATE rb_syndications SET status = 'pending', platform_url = ?, external_id = ?, notes = ?, updated_at = datetime('now') WHERE id = ?"
+        ).bind(body.platform_url || null, body.external_id || null, body.notes || null, id).run();
+      } else {
+        await env.DB.prepare(
+          'INSERT INTO rb_syndications (id, publication_id, platform, platform_url, status, external_id, notes) VALUES (?, ?, ?, ?, ?, ?, ?)'
+        ).bind(id, body.publication_id, body.platform, body.platform_url || null, 'pending', body.external_id || null, body.notes || null).run();
+      }
+
+      // Prepare syndication-ready content
+      const canonicalUrl = `https://roadbook.blackroad.io/api/publications/${pub.id}`;
+      const syndicationContent = {
+        title: pub.title,
+        content: pub.content,
+        summary: pub.summary,
+        author: pub.author,
+        canonical_url: canonicalUrl,
+        doi: pub.doi,
+        tags: typeof pub.tags === 'string' ? JSON.parse(pub.tags || '[]') : pub.tags || [],
+        attribution: `Originally published on RoadBook (BlackRoad OS) - ${canonicalUrl}`,
+      };
+
+      return json({ ok: true, syndication_id: id, platform: body.platform, status: 'pending', content: syndicationContent }, 201);
+    }
+
+    const syndicateMatch = path.match(/^\/api\/syndicate\/([^/]+)$/);
+    const syndicateStatusMatch = path.match(/^\/api\/syndicate\/([^/]+)\/status$/);
+
+    // Get syndication details
+    if (syndicateMatch && method === 'GET') {
+      const syn = await env.DB.prepare('SELECT s.*, p.title as publication_title, p.author, p.doi FROM rb_syndications s JOIN roadbook_publications p ON p.id = s.publication_id WHERE s.id = ?').bind(syndicateMatch[1]).first();
+      if (!syn) return json({ error: 'Syndication not found' }, 404);
+      return json({ syndication: syn });
+    }
+
+    // Update syndication status
+    if (syndicateStatusMatch && method === 'POST') {
+      const body = await request.json();
+      if (!body.status) return json({ error: 'status required' }, 400);
+      const validStatuses = ['pending', 'syndicated', 'failed', 'removed', 'updated'];
+      if (!validStatuses.includes(body.status)) return json({ error: `status must be one of: ${validStatuses.join(', ')}` }, 400);
+      const syn = await env.DB.prepare('SELECT id FROM rb_syndications WHERE id = ?').bind(syndicateStatusMatch[1]).first();
+      if (!syn) return json({ error: 'Syndication not found' }, 404);
+
+      await env.DB.prepare(
+        "UPDATE rb_syndications SET status = ?, platform_url = COALESCE(?, platform_url), external_id = COALESCE(?, external_id), syndicated_at = CASE WHEN ? = 'syndicated' THEN datetime('now') ELSE syndicated_at END, last_synced_at = datetime('now'), views_on_platform = COALESCE(?, views_on_platform), notes = COALESCE(?, notes), updated_at = datetime('now') WHERE id = ?"
+      ).bind(body.status, body.platform_url || null, body.external_id || null, body.status, body.views_on_platform || null, body.notes || null, syndicateStatusMatch[1]).run();
+
+      return json({ ok: true, syndication_id: syndicateStatusMatch[1], status: body.status });
+    }
+
+    // Delete syndication
+    if (syndicateMatch && method === 'DELETE') {
+      const syn = await env.DB.prepare('SELECT id FROM rb_syndications WHERE id = ?').bind(syndicateMatch[1]).first();
+      if (!syn) return json({ error: 'Syndication not found' }, 404);
+      await env.DB.prepare('DELETE FROM rb_syndications WHERE id = ?').bind(syndicateMatch[1]).run();
+      return json({ ok: true, deleted: syndicateMatch[1] });
+    }
+
+    // Syndication stats
+    if (path === '/api/syndicate/stats' && method === 'GET') {
+      const totalSyn = await env.DB.prepare('SELECT COUNT(*) as count FROM rb_syndications').first();
+      const activeSyn = await env.DB.prepare("SELECT COUNT(*) as count FROM rb_syndications WHERE status = 'syndicated'").first();
+      const byPlatform = await env.DB.prepare('SELECT platform, COUNT(*) as count, SUM(views_on_platform) as total_views FROM rb_syndications GROUP BY platform ORDER BY count DESC').all();
+      const totalExternalViews = await env.DB.prepare('SELECT COALESCE(SUM(views_on_platform), 0) as total FROM rb_syndications').first();
+      const recentSyndications = await env.DB.prepare(
+        "SELECT s.id, s.platform, s.status, s.platform_url, s.syndicated_at, p.title FROM rb_syndications s JOIN roadbook_publications p ON p.id = s.publication_id ORDER BY s.created_at DESC LIMIT 10"
+      ).all();
+      return json({
+        total_syndications: totalSyn?.count || 0,
+        active_syndications: activeSyn?.count || 0,
+        total_external_views: totalExternalViews?.total || 0,
+        by_platform: byPlatform.results || [],
+        recent: recentSyndications.results || [],
+      });
     }
 
     return json({ error: 'Not found', service: 'roadbook' }, 404);
