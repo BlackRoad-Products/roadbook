@@ -11,6 +11,7 @@ const ROOT_HTML = `<!-- PROPRIETARY. Copyright 2025-2026 BlackRoad OS, Inc. All 
 <meta property="og:url" content="https://roadbook.blackroad.io"><meta property="og:image" content="https://images.blackroad.io/pixel-art/road-logo.png">
 <meta name="twitter:card" content="summary_large_image"><meta name="robots" content="index, follow, noai, noimageai">
 <link rel="canonical" href="https://roadbook.blackroad.io/">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"RoadBook","url":"https://roadbook.blackroad.io/","description":"Open publishing platform with DOIs, peer review, citations, and RoadChain provenance. 79+ articles on AI, sovereignty, education.","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"BlackRoad OS, Inc.","url":"https://blackroad.io"}}</script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230a0a0a'/><circle cx='10' cy='16' r='5' fill='%23FF2255'/><rect x='18' y='11' width='10' height='10' rx='2' fill='%238844FF'/></svg>" type="image/svg+xml">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
@@ -727,6 +728,11 @@ export default {
     const method = request.method;
 
     if (path === "/" || path === "") return new Response(ROOT_HTML, { headers: { ...CORS, "Content-Type": "text/html;charset=UTF-8" } });
+
+    if (path === '/sitemap.xml') {
+      return new Response(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>https://roadbook.blackroad.io/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>\n  <url><loc>https://roadbook.blackroad.io/api/discover</loc><changefreq>daily</changefreq><priority>0.8</priority></url>\n  <url><loc>https://roadbook.blackroad.io/api/discover/trending</loc><changefreq>daily</changefreq><priority>0.7</priority></url>\n</urlset>`, { headers: { 'Content-Type': 'application/xml', ...CORS } });
+    }
+
     await ensureTables(env.DB);
 
     // Health
