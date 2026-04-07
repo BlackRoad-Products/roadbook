@@ -5,7 +5,15 @@ async function track(env: Env, req: Request, path: string) { const cf=(req as an
 
 function page(entries: any[], signals: any[]): Response {
   const html=`<!DOCTYPE html><html lang="en"><head>
-<meta charset="UTF-8"><title>RoadBook — BlackRoad Publishing</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RoadBook — Knowledge Publisher</title>
+<meta name="description" content="Open publishing platform for articles, research, and documentation on BlackRoad OS.">
+<link rel="canonical" href="https://roadbook.blackroad.io/">
+<meta property="og:title" content="RoadBook — Knowledge Publisher">
+<meta property="og:description" content="Open publishing platform for articles, research, and documentation on BlackRoad OS.">
+<meta property="og:url" content="https://roadbook.blackroad.io/">
+<meta property="og:type" content="website">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"RoadBook","url":"https://roadbook.blackroad.io/","description":"Open publishing platform for articles, research, and documentation on BlackRoad OS.","applicationCategory":"WebApplication","publisher":{"@type":"Organization","name":"BlackRoad OS, Inc.","url":"https://blackroad.io"}}</script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
