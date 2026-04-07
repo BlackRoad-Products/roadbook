@@ -9,7 +9,7 @@ function page(entries: any[], signals: any[]): Response {
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#030303;--card:#0a0a0a;--border:#111;--text:#f0f0f0;--sub:#444;--blue:#4488FF;--grad:linear-gradient(135deg,#4488FF,#CC00AA)}
+:root{--bg:#030303;--card:#0a0a0a;--border:#111;--text:#f0f0f0;--sub:#444;--blue:#3E84FF;--grad:linear-gradient(135deg,#3E84FF,#FF00D4)}
 html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif}
 .grad-bar{height:2px;background:var(--grad)}
 .wrap{max-width:1000px;margin:0 auto;padding:32px 20px}
@@ -77,7 +77,7 @@ async function doSearch(){
   var d=await r.json();
   var el=document.getElementById('entries');
   if(!d.results?.length){el.innerHTML='<div class="empty">No results for "'+q+'"</div>';return;}
-  el.innerHTML=d.results.map(function(r){return'<div class="entry"><div class="entry-cat">'+r.source+'</div><div class="entry-title">'+r.title+'</div><div class="entry-excerpt">'+(r.excerpt||'').replace(/<[^>]+>/g,'').slice(0,180)+'</div><div class="entry-meta"><a href="'+r.url+'" target="_blank" style="color:#4488FF">open →</a></div></div>';}).join('');
+  el.innerHTML=d.results.map(function(r){return'<div class="entry"><div class="entry-cat">'+r.source+'</div><div class="entry-title">'+r.title+'</div><div class="entry-excerpt">'+(r.excerpt||'').replace(/<[^>]+>/g,'').slice(0,180)+'</div><div class="entry-meta"><a href="'+r.url+'" target="_blank" style="color:#3E84FF">open →</a></div></div>';}).join('');
 }
 document.getElementById('q').addEventListener('keydown',function(e){if(e.key==='Enter')doSearch();});
 </script>
