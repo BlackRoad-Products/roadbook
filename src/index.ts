@@ -85,7 +85,7 @@ async function doSearch(){
   var d=await r.json();
   var el=document.getElementById('entries');
   if(!d.results?.length){el.innerHTML='<div class="empty">No results for "'+q+'"</div>';return;}
-  el.innerHTML=d.results.map(function(r){return'<div class="entry"><div class="entry-cat">'+r.source+'</div><div class="entry-title">'+r.title+'</div><div class="entry-excerpt">'+(r.excerpt||'').replace(/<[^>]+>/g,'').slice(0,180)+'</div><div class="entry-meta"><a href="'+r.url+'" target="_blank" style="color:#3E84FF">open →</a></div></div>';}).join('');
+  el.innerHTML=d.results.map(function(r){return'<div class="entry"><div class="entry-cat">'+r.source+'</div><div class="entry-title">'+r.title+'</div><div class="entry-excerpt">'+(r.excerpt||'').replace(/<[^>]+>/g,'').slice(0,180)+'</div><div class="entry-meta"><a href="'+r.url+'" target="_blank" style="color:#ccc;text-decoration:underline">open →</a></div></div>';}).join('');
 }
 document.getElementById('q').addEventListener('keydown',function(e){if(e.key==='Enter')doSearch();});
 </script>
