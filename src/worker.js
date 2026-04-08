@@ -5,6 +5,7 @@
 const ROOT_HTML = `<!-- PROPRIETARY. Copyright 2025-2026 BlackRoad OS, Inc. All rights reserved. NOT open source. -->
 <!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://images.blackroad.io/brand/brand.css">
 <title>RoadBook \u2014 Open Knowledge Platform \u2014 BlackRoad OS</title>
 <meta name="description" content="Publish, discover, and preserve articles, research, and knowledge on BlackRoad OS. 72+ articles with DOIs and provenance hashes.">
 <meta property="og:title" content="RoadBook \u2014 BlackRoad OS"><meta property="og:description" content="Open publishing platform with RoadChain provenance. 72+ articles on AI, sovereignty, education.">
@@ -1274,6 +1275,7 @@ export default {
       const jsonLd = JSON.stringify({"@context":"https://schema.org","@type":"Article","headline":article.title,"author":{"@type":"Person","name":article.author},"datePublished":article.date,"description":article.description,"publisher":{"@type":"Organization","name":"BlackRoad OS, Inc.","url":"https://blackroad.io"},"mainEntityOfPage":{"@type":"WebPage","@id":`https://roadbook.blackroad.io/read/${slug}`},"keywords":article.tags.join(', ')});
       const articleHtml = `<!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://images.blackroad.io/brand/brand.css">
 <title>${article.title} — RoadBook</title>
 <meta name="description" content="${article.description}">
 <meta name="author" content="${article.author}">
@@ -1335,6 +1337,7 @@ ${relatedHtml}
       const discoverJsonLd = JSON.stringify({"@context":"https://schema.org","@type":"CollectionPage","name":"Discover Articles — RoadBook","description":`Browse ${ARTICLES.length} articles on AI, sovereignty, education, math, and development.`,"url":"https://roadbook.blackroad.io/discover","publisher":{"@type":"Organization","name":"BlackRoad OS, Inc."}});
       const discoverHtml = `<!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://images.blackroad.io/brand/brand.css">
 <title>Discover Articles — RoadBook — BlackRoad OS</title>
 <meta name="description" content="Browse ${ARTICLES.length} articles on AI agents, sovereign computing, mathematics, education, and building with BlackRoad OS.">
 <meta property="og:title" content="Discover Articles — RoadBook"><meta property="og:description" content="Browse ${ARTICLES.length} articles on AI, sovereignty, education, and development.">
@@ -1380,6 +1383,7 @@ ${sections}
       const catJsonLd = JSON.stringify({"@context":"https://schema.org","@type":"CollectionPage","name":`${cat} Articles — RoadBook`,"description":`${catArticles.length} articles about ${cat} on RoadBook.`,"url":`https://roadbook.blackroad.io/discover/category/${encodeURIComponent(cat)}`,"publisher":{"@type":"Organization","name":"BlackRoad OS, Inc."}});
       const catHtml = `<!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://images.blackroad.io/brand/brand.css">
 <title>${cat} — RoadBook — BlackRoad OS</title>
 <meta name="description" content="${catArticles.length} articles about ${cat}. Read about AI agents, sovereign computing, and more on RoadBook.">
 <meta property="og:title" content="${cat} — RoadBook"><meta property="og:description" content="${catArticles.length} articles about ${cat} on RoadBook.">
@@ -2169,7 +2173,7 @@ ${cards}
         const md = `# ${pub.title}\n\n*By ${pub.author} | Reading time: ${pub.reading_time || estimateReadingTime(pub.content)} min*\n\n> ${pub.summary || ''}\n\n${pub.content}${provenance}`;
         return new Response(md, { status: 200, headers: { ...CORS, 'Content-Type': 'text/markdown; charset=utf-8', 'Content-Disposition': `attachment; filename="${pub.title.replace(/[^a-zA-Z0-9]/g, '_')}.md"` } });
       } else if (format === 'html') {
-        const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${pub.title}</title></head><body><h1>${pub.title}</h1><p>By ${pub.author}</p><div>${pub.content || ''}</div><hr><pre>${provenance}</pre></body></html>`;
+        const html = `<!DOCTYPE html><html><head><link rel="stylesheet" href="https://images.blackroad.io/brand/brand.css"><meta charset="UTF-8"><title>${pub.title}</title></head><body><h1>${pub.title}</h1><p>By ${pub.author}</p><div>${pub.content || ''}</div><hr><pre>${provenance}</pre></body></html>`;
         return new Response(html, { status: 200, headers: { ...CORS, 'Content-Type': 'text/html; charset=utf-8', 'Content-Disposition': `attachment; filename="${pub.title.replace(/[^a-zA-Z0-9]/g, '_')}.html"` } });
       } else {
         // JSON export with full provenance
