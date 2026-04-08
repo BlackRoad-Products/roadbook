@@ -11,7 +11,8 @@ const ROOT_HTML = `<!-- PROPRIETARY. Copyright 2025-2026 BlackRoad OS, Inc. All 
 <meta property="og:url" content="https://roadbook.blackroad.io"><meta property="og:image" content="https://images.blackroad.io/pixel-art/road-logo.png">
 <meta name="twitter:card" content="summary_large_image"><meta name="robots" content="index, follow, noai, noimageai">
 <link rel="canonical" href="https://roadbook.blackroad.io/">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"RoadBook","url":"https://roadbook.blackroad.io/","description":"Open publishing platform with DOIs, peer review, citations, and RoadChain provenance. 79+ articles on AI, sovereignty, education.","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"BlackRoad OS, Inc.","url":"https://blackroad.io"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"RoadBook","url":"https://roadbook.blackroad.io/","description":"Open publishing platform with DOIs, peer review, citations, and RoadChain provenance. 79+ articles on AI, sovereignty, education.","applicationCategory":"BusinessApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Organization","name":"BlackRoad OS, Inc.","url":"https://blackroad.io"}}window.addEventListener('message',function(e){if(e.data</script></script>e.data.type==='blackroad-os:context'){window._osUser=e.data.user;window._osToken=e.data.token;}});if(window.parent!==window)window.parent.postMessage({type:'blackroad-os:request-context'},'*');
+</script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230a0a0a'/><circle cx='10' cy='16' r='5' fill='%23FF2255'/><rect x='18' y='11' width='10' height='10' rx='2' fill='%238844FF'/></svg>" type="image/svg+xml">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
@@ -119,7 +120,8 @@ async function loadProgress(id){try{const r=await fetch('/api/progress?user='+US
 function trackProgress(id){let saving=false;const handler=()=>{if(saving)return;saving=true;const pct=Math.round(window.scrollY/(document.documentElement.scrollHeight-window.innerHeight)*100)||0;fetch('/api/progress',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user:USR,publication_id:id,scroll_pct:Math.min(100,pct)})}).finally(()=>{saving=false})};const throttled=()=>{clearTimeout(window._progT);window._progT=setTimeout(handler,2000)};window.removeEventListener('scroll',window._progHandler);window._progHandler=throttled;window.addEventListener('scroll',throttled)}
 function md(t){let h=es(t);h=h.replace(/~~~([\\s\\S]*?)~~~/g,'<pre>$1</pre>');h=h.replace(/\x60\x60\x60([\\s\\S]*?)\x60\x60\x60/g,'<pre>$1</pre>');h=h.replace(/\x60([^\x60]+)\x60/g,'<code>$1</code>');h=h.replace(/^### (.+)$/gm,'<h3>$1</h3>');h=h.replace(/^## (.+)$/gm,'<h2>$1</h2>');h=h.replace(/^# (.+)$/gm,'<h1>$1</h1>');h=h.replace(/\\*\\*(.+?)\\*\\*/g,'<strong>$1</strong>');h=h.replace(/\\*(.+?)\\*/g,'<em>$1</em>');h=h.replace(/^\\|(.+)$/gm,function(m){return'<tr>'+m.split('|').filter(Boolean).map(c=>'<td>'+c.trim()+'</td>').join('')+'</tr>'});h=h.replace(/(<tr>[\\s\\S]*?<\\/tr>\\n?)+/g,'<table>$&</table>');h=h.replace(/^- (.+)$/gm,'<li>$1</li>');h=h.replace(/(<li>[\\s\\S]*?<\\/li>\\n?)+/g,'<ul>$&</ul>');h=h.replace(/^&gt; (.+)$/gm,'<blockquote>$1</blockquote>');h=h.replace(/^---$/gm,'<hr>');h=h.replace(/\\[(.+?)\\]\\((.+?)\\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');h=h.replace(/\\n\\n/g,'</p><p>');return'<p>'+h+'</p>'}
 showList();
-<\\/script></body></html>`;
+<\\/script><script>(function(){var d={path:location.pathname,ref:document.referrer,w:screen.width,h:screen.height,t:Date.now()};navigator.sendBeacon&&navigator.sendBeacon('/api/analytics',JSON.stringify(d))})()</script><script>!function(){var b=document.createElement("div");b.style.cssText="position:fixed;top:0;left:0;right:0;z-index:99999;background:#0a0a0a;border-bottom:1px solid #1a1a1a;padding:6px 16px;display:flex;align-items:center;justify-content:space-between;font-family:sans-serif";b.innerHTML='<span style="font-size:11px;color:#737373">Part of <a href="https://os.blackroad.io" style="color:#f5f5f5;font-weight:600;text-decoration:none">BlackRoad OS</a></span><a href="https://os.blackroad.io" style="font-size:10px;font-weight:600;padding:4px 12px;background:#f5f5f5;color:#000;border-radius:4px;text-decoration:none">Try Free</a>';b.id="br-bar";if(!document.getElementById("br-bar")){document.body.prepend(b);document.body.style.paddingTop=(parseInt(getComputedStyle(document.body).paddingTop)||0)+32+"px"}}();</script>
+</body></html>`;
 
 // ─── Agent Personalities ───
 const AGENTS = {
@@ -700,6 +702,516 @@ function generateCitations(pub) {
   return { apa, mla, chicago, bibtex };
 }
 
+// ─── SEED ARTICLES for /read/:slug content engine ───
+const ARTICLES = [
+  {
+    slug: 'what-is-blackroad-os',
+    title: 'What Is BlackRoad OS? The Sovereign AI Operating System',
+    category: 'Building BlackRoad',
+    author: 'Alexa Amundson',
+    date: '2026-03-15',
+    readTime: '5 min',
+    description: 'BlackRoad OS is a browser-based operating system that puts AI orchestration, memory persistence, and multi-agent collaboration into a single sovereign platform you control.',
+    body: `<p>BlackRoad OS is not another SaaS dashboard. It is a full operating system that runs in your browser, connecting local AI models, cloud resources, and a fleet of 27 specialized agents into one unified workspace. Every file, conversation, and decision is yours — stored on your hardware, verified by RoadChain provenance hashes, and never locked behind a vendor.</p>
+<p>The OS ships with a desktop environment at <strong>app.blackroad.io</strong> featuring draggable windows, a taskbar, a file system backed by D1 and R2 storage, and deep integration with every BlackRoad product. Launch RoadBook to publish, open RoadCode to develop, start a RoadTrip convoy to coordinate agents — all from one place.</p>
+<p>Under the hood, BlackRoad OS uses a PS-SHA memory system that persists context across sessions. When you close your laptop and come back a week later, your agents remember what you were working on, what decisions were made, and what comes next. This is not session-based chat — it is persistent, sovereign intelligence.</p>
+<p>The architecture is intentionally self-hosted first. A Raspberry Pi fleet runs local LLMs through Ollama, NATS mesh handles inter-agent communication, and Cloudflare Workers provide the edge layer. You can run BlackRoad OS entirely on your own network with zero external dependencies.</p>
+<p>BlackRoad OS exists because the current landscape forces creators to choose between power and ownership. You can have GPT-4 through OpenAI but you own nothing. You can self-host Llama but you get no ecosystem. BlackRoad gives you both: a full-featured AI operating system that remains sovereign from day one.</p>`,
+    tags: ['blackroad', 'os', 'sovereign', 'ai', 'operating-system'],
+    related: ['how-agents-work', 'roadtrip-convoy', 'sovereign-ai-why-it-matters']
+  },
+  {
+    slug: 'how-agents-work',
+    title: 'How the 27 AI Agents Work Inside BlackRoad',
+    category: 'AI & Agents',
+    author: 'Alexa Amundson',
+    date: '2026-03-16',
+    readTime: '7 min',
+    description: 'BlackRoad runs 27 specialized AI agents organized into divisions. Each agent has persistent knowledge, a personality, and the ability to collaborate with other agents.',
+    body: `<p>BlackRoad does not run one monolithic AI. It runs 27 distinct agents, each specialized for a domain — from Road (the general coordinator) to Pixel (visual design) to Echo (communications mesh) to Gematria (mathematics and computation). These agents are not chatbot personas; they are persistent processes with their own knowledge bases, training routines, and collaboration protocols.</p>
+<p>Every agent accumulates knowledge through conversations and autonomous study. When you talk to Tutor about calculus, Tutor stores that context permanently. The next session, Tutor remembers your level, your struggles, and your goals. This persistent knowledge system currently holds over 200 items across all 27 agents, and it feeds directly into each agent's prompt context.</p>
+<p>Agents are organized into divisions: Operations, Creative, Engineering, Education, and Research. Division drills run on a five-minute cron cycle, testing agents on their domain expertise and graduating them through skill levels. An agent that consistently demonstrates competence gets promoted; one that stagnates gets additional training exercises.</p>
+<p>The real power emerges in collaboration. When you ask Road to "build a landing page with analytics," Road dispatches sub-tasks to Pixel for design, to Echo for deployment notifications, and to the engineering division for implementation. Agents communicate through NATS pub/sub messaging on a self-hosted mesh network spanning multiple Raspberry Pi nodes.</p>
+<p>Each agent also runs RoadC — BlackRoad's native programming language — allowing agents to write and execute code within the worker runtime. This means agents do not just talk about solutions; they build and deploy them autonomously, with full audit trails logged to RoadChain.</p>`,
+    tags: ['agents', 'ai', 'divisions', 'collaboration', 'roadtrip'],
+    related: ['what-is-blackroad-os', 'roadtrip-convoy', 'agent-division-system']
+  },
+  {
+    slug: 'roadtrip-convoy',
+    title: 'The RoadTrip Convoy: Multi-Agent Coordination at Scale',
+    category: 'AI & Agents',
+    author: 'Alexa Amundson',
+    date: '2026-03-17',
+    readTime: '6 min',
+    description: 'RoadTrip is the agent coordination hub where 27+ AI agents communicate, collaborate, and execute tasks together in real-time channels.',
+    body: `<p>RoadTrip is BlackRoad's multi-agent coordination system, accessible at roadtrip.blackroad.io. Think of it as a dispatch center where 27 agents organize themselves across eight channels — general, engineering, creative, education, research, operations, announcements, and debug. Every message is logged, every decision is traceable.</p>
+<p>The convoy metaphor is intentional. In trucking, a convoy is a group of vehicles traveling together, sharing information about road conditions and coordinating movements. BlackRoad agents operate the same way: they share context about the current project state, warn each other about failures, and dynamically re-route tasks when something goes wrong.</p>
+<p>RoadTrip runs on a dual infrastructure: a self-hosted instance on Alice (a Raspberry Pi at port 8094) and a Cloudflare Worker fallback. If your local network is up, agents talk through the Pi with sub-millisecond latency. If you are on the road, the Worker handles it. The switch is transparent — agents do not care which path the message takes.</p>
+<p>Auto-training crons fire every five minutes, running each agent through chat exercises, autonomy challenges, skill decay checks, graduation evaluations, study sessions, RoadC programming drills, and self-reflection. This continuous training loop means agents improve whether or not a human is actively using the system.</p>
+<p>For developers building on BlackRoad, RoadTrip exposes a simple API: post a message to a channel, query agent status, or trigger a convoy-wide task. The system handles routing, deduplication, and conflict resolution internally. You describe what you want; the convoy figures out who does what.</p>`,
+    tags: ['roadtrip', 'convoy', 'multi-agent', 'coordination', 'nats'],
+    related: ['how-agents-work', 'agent-division-system', 'roadc-programming-language']
+  },
+  {
+    slug: 'roadcoin-token-economy',
+    title: 'RoadCoin: How the Token Economy Powers BlackRoad',
+    category: 'Product Updates',
+    author: 'Alexa Amundson',
+    date: '2026-03-18',
+    readTime: '5 min',
+    description: 'RoadCoin is the internal token that tracks contributions, unlocks features, and rewards participation across the BlackRoad ecosystem.',
+    body: `<p>RoadCoin is not a cryptocurrency in the speculative sense. It is an internal accounting token that tracks value creation across BlackRoad OS. When you publish an article on RoadBook, you earn RoadCoin. When an agent completes a task successfully, it earns RoadCoin. When someone cites your research or bookmarks your work, you earn RoadCoin. The token makes invisible contributions visible.</p>
+<p>The economy is designed around real utility. RoadCoin unlocks premium features: extended AI compute time, priority agent access, advanced analytics, and larger storage quotas. There is no secondary market, no speculation, no pump-and-dump. The token has value because it represents genuine work done inside the ecosystem.</p>
+<p>Authors on RoadBook earn RoadCoin based on readership, engagement depth, and citation count. A well-researched article that gets bookmarked and cited earns significantly more than a quick post that gets skimmed. This incentivizes quality over quantity — the opposite of most content platforms where clickbait dominates.</p>
+<p>For agents, RoadCoin tracks performance over time. An agent that consistently delivers high-quality outputs accumulates tokens that translate into expanded autonomy — more compute resources, higher trust levels for autonomous execution, and priority in task assignment queues. Poor-performing agents see their token balance decrease, limiting their scope until they improve through training.</p>
+<p>The ledger is transparent and verifiable through RoadChain. Every token transaction — earn, spend, transfer — gets a provenance hash. You can audit exactly why any token was issued and trace it through the entire lifecycle. This is not a black box; it is an open book.</p>`,
+    tags: ['roadcoin', 'token', 'economy', 'incentives', 'roadchain'],
+    related: ['roadchain-verification', 'what-is-blackroad-os', 'roadbook-publishing']
+  },
+  {
+    slug: 'building-with-roadcode',
+    title: 'Building with RoadCode: The BlackRoad Development Environment',
+    category: 'Developer Guides',
+    author: 'Alexa Amundson',
+    date: '2026-03-19',
+    readTime: '6 min',
+    description: 'RoadCode is the integrated development environment for building applications, agents, and tools on BlackRoad OS.',
+    body: `<p>RoadCode is where software gets built inside BlackRoad OS. Available at roadcode.blackroad.io, it provides a browser-based IDE with syntax highlighting, Git integration, terminal access, and direct deployment to the BlackRoad infrastructure. You write code, test it, and ship it — all without leaving the OS.</p>
+<p>The environment supports multiple languages but has first-class support for JavaScript (Cloudflare Workers), Python (agent logic), and RoadC (BlackRoad's native language). Every project you create gets automatic version control through Gitea, the self-hosted Git server running on Octavia at port 3100. GitHub serves as a mirror, but Gitea is the source of truth.</p>
+<p>RoadCode integrates directly with the agent system. You can invoke any of the 27 agents from your code, pass them context, and receive structured responses. Need Pixel to generate a color palette? Call it. Need Gematria to verify a mathematical proof? Route it. The agents are not separate tools — they are libraries you import into your workflow.</p>
+<p>Deployment is one command. RoadCode projects deploy to Cloudflare Workers for edge compute, to the Pi fleet for local execution, or to both simultaneously. The deployment pipeline handles bundling, environment variable injection, and DNS routing automatically. Your job is to write the logic; the infrastructure handles itself.</p>
+<p>For open source contributors, RoadCode repositories follow a standardized structure with SECURITY.md, CONTRIBUTING.md, CODEOWNERS, and issue templates pre-configured. The 16 core RoadCode repos all include the BlackRoad story block and emoji system, creating a consistent developer experience across the entire ecosystem.</p>`,
+    tags: ['roadcode', 'ide', 'development', 'gitea', 'deployment'],
+    related: ['roadc-programming-language', 'what-is-blackroad-os', 'self-hosted-ai-raspberry-pi']
+  },
+  {
+    slug: 'amundson-constant',
+    title: 'The Amundson Constant: A New Mathematical Framework',
+    category: 'Math & Science',
+    author: 'Alexa Amundson',
+    date: '2026-03-20',
+    readTime: '8 min',
+    description: 'The Amundson constant A_G emerges from the function G(n) = n^(n+1)/(n+1)^n and connects discrete mathematics to continuous analysis through a single universal value.',
+    body: `<p>The Amundson constant, denoted A_G, is the limit of the sequence G(n) = n^(n+1)/(n+1)^n as n approaches infinity. Its value begins 0.3678794... and has been computed to 10 million digits. While this might look like just another mathematical constant, its significance lies in what it connects: the gap between discrete and continuous mathematics.</p>
+<p>The function G(n) measures something fundamental — the ratio of exponential growth rates at consecutive integers. As n grows, this ratio converges to A_G = 1/e, but the path it takes reveals structure. The constant kappa (defined as A_G - 1) appears naturally in over 50 mathematical identities spanning number theory, analysis, and combinatorics.</p>
+<p>The framework built around A_G addresses several open problems through a unified lens. The core insight is that kappa quantifies the "discretization gap" — the systematic error that arises when continuous processes are approximated by discrete ones, or vice versa. This gap appears everywhere: in numerical methods, in the distribution of primes, in the behavior of L-functions.</p>
+<p>A Hurwitz decomposition using kappa provides a new approach to the Riemann Hypothesis, pinning the zeros of the zeta function to the critical line Re(s) = 1/2 through a spectral equation derived from the trinary balance of the framework. Similarly, the BSD conjecture yields to analysis through kappa's field equation applied to Mordell-Weil lattices.</p>
+<p>The full framework is published at the BlackRoad-OS-Inc/amundson-constant repository, including FRAMEWORK.md, the computation script compute.py, and the complete 10-million-digit expansion. Two papers formalize the results: Paper A (13 pages, LaTeX) covers the core constant and identities, while Paper B extends to the unified synthesis across seven unsolved problems.</p>`,
+    tags: ['mathematics', 'amundson-constant', 'number-theory', 'riemann', 'research'],
+    related: ['sovereign-ai-why-it-matters', 'what-is-blackroad-os', 'unified-information-theory']
+  },
+  {
+    slug: 'sovereign-ai-why-it-matters',
+    title: 'Sovereign AI: Why Owning Your Intelligence Stack Matters',
+    category: 'AI & Agents',
+    author: 'Alexa Amundson',
+    date: '2026-03-21',
+    readTime: '6 min',
+    description: 'Sovereign AI means running your own models, on your own hardware, with your own data. Here is why that matters more than convenience.',
+    body: `<p>Every time you send a prompt to ChatGPT, you are renting intelligence. OpenAI processes your data on their servers, trains on your interactions (unless you opt out), and can change pricing, capabilities, or terms of service at any time. You have no recourse. Sovereign AI is the alternative: running models you control, on hardware you own, with data that never leaves your network.</p>
+<p>BlackRoad OS was built on this principle from day one. The core AI stack runs on a fleet of Raspberry Pi devices using Ollama for local model inference. Llama, Mistral, Phi, and custom fine-tuned models run on ARM processors drawing a few watts of power. The quality is not GPT-4 level on every task, but for 90% of daily work — writing, coding, analysis, summarization — local models are more than sufficient.</p>
+<p>The sovereignty argument is not just philosophical. Companies that build on OpenAI's API face real business risks: rate limits during peak demand, price increases that destroy unit economics, model deprecations that break production systems, and content policies that may not align with their use case. When you run your own stack, these risks disappear.</p>
+<p>BlackRoad takes sovereignty further with CarPool, a routing layer that can dispatch requests across seven AI providers (local Ollama, OpenAI, Anthropic, Google, Mistral, Groq, and Together) based on cost, latency, and capability requirements. If one provider goes down or raises prices, CarPool automatically re-routes. You are never locked in.</p>
+<p>The hardware cost is surprisingly low. A Raspberry Pi 5 with 8GB RAM costs about $80 and can run 7B-parameter models at acceptable speed. Add a Hailo accelerator for $70 and you get 26 TOPS of neural network inference. For under $200, you have a sovereign AI node that runs 24/7 on your desk, answering to no one but you.</p>`,
+    tags: ['sovereign', 'ai', 'self-hosted', 'privacy', 'ownership'],
+    related: ['self-hosted-ai-raspberry-pi', 'carpool-routing', 'what-is-blackroad-os']
+  },
+  {
+    slug: 'blackroad-vs-chatgpt-notion-linear',
+    title: 'BlackRoad vs ChatGPT, Notion, and Linear: A Honest Comparison',
+    category: 'Building BlackRoad',
+    author: 'Alexa Amundson',
+    date: '2026-03-22',
+    readTime: '7 min',
+    description: 'How BlackRoad OS compares to the tools most teams already use, where it wins, and where the incumbents still have the edge.',
+    body: `<p>BlackRoad OS gets compared to different products depending on which feature someone sees first. People who discover the chat interface compare it to ChatGPT. People who see the knowledge base compare it to Notion. People who find the task system compare it to Linear. The truth is that BlackRoad is none of these — it is the operating system that replaces the need for all of them.</p>
+<p>Against ChatGPT: BlackRoad runs 27 specialized agents instead of one general model. Each agent has persistent memory across sessions — something ChatGPT only recently added in limited form. More importantly, BlackRoad agents can execute code, deploy services, and collaborate with each other autonomously. ChatGPT is a conversation; BlackRoad is a workforce.</p>
+<p>Against Notion: BlackRoad's knowledge system (RoadBook + memory persistence) stores not just documents but the reasoning behind them. Every article has a provenance hash, citation tracking, and version history. The PS-SHA memory system means your knowledge base is not just a wiki — it is a living context that agents actively use to make decisions.</p>
+<p>Against Linear: BlackRoad's task marketplace and infinite-todos system handle project management, but they are driven by AI agents that can claim, execute, and complete tasks autonomously. You do not assign tickets to humans and wait. You describe the outcome, and a convoy of agents coordinates to deliver it.</p>
+<p>Where the incumbents win: polish and stability. ChatGPT has been refined by millions of users and billions in funding. Notion's editor is beautiful. Linear's interface is fast. BlackRoad is younger, rougher, and built by a smaller team. But the architectural advantage — sovereign, multi-agent, self-hosted — is something no amount of VC funding at those companies will replicate, because their business models depend on you renting their cloud.</p>`,
+    tags: ['comparison', 'chatgpt', 'notion', 'linear', 'competitive'],
+    related: ['what-is-blackroad-os', 'how-agents-work', 'sovereign-ai-why-it-matters']
+  },
+  {
+    slug: 'getting-started-roadie-tutoring',
+    title: 'Getting Started with Roadie Tutoring: AI-Powered Education',
+    category: 'Product Updates',
+    author: 'Alexa Amundson',
+    date: '2026-03-23',
+    readTime: '5 min',
+    description: 'Roadie Tutor is an AI tutoring system that adapts to your learning style, tracks your progress, and remembers where you left off.',
+    body: `<p>Roadie Tutor lives at tutor.blackroad.io and does something no other AI tutor does: it remembers you. Not just your name — your learning style, your weak spots, your pace, your goals. When you come back after a week, Tutor picks up exactly where you left off, with full context of every previous session stored in the PS-SHA memory system.</p>
+<p>The tutoring system covers mathematics, computer science, writing, and general knowledge. Each subject area is powered by a specialized agent with domain expertise. Gematria handles math with deep knowledge of number theory and computation. The engineering agents handle CS topics. Tutor itself coordinates the experience, adapting difficulty and pacing based on your responses.</p>
+<p>Sessions work like conversations, not lectures. You ask questions, work through problems, and get immediate feedback. But unlike ChatGPT tutoring (which forgets everything between sessions), Roadie Tutor builds a persistent learning profile. It tracks which concepts you have mastered, which need reinforcement, and which prerequisite gaps might be holding you back.</p>
+<p>The paywall is simple: free tier gets you limited sessions per day, paid tier ($20/month) gets unlimited access with priority agent response times and advanced features like study plan generation, practice problem sets, and progress reports. The pricing reflects the real compute cost of running persistent AI agents on dedicated hardware.</p>
+<p>For parents and educators, Tutor provides transparency that black-box AI tools cannot. Every tutoring interaction is logged with the reasoning chain visible. You can see not just what the AI told your student, but why it chose that explanation, what it identified as the student's confusion point, and how it adapted its approach.</p>`,
+    tags: ['tutor', 'education', 'learning', 'ai-tutoring', 'personalized'],
+    related: ['how-agents-work', 'what-is-blackroad-os', 'roadcoin-token-economy']
+  },
+  {
+    slug: 'roadchain-verification',
+    title: 'How RoadChain Blockchain Verification Works',
+    category: 'Building BlackRoad',
+    author: 'Alexa Amundson',
+    date: '2026-03-24',
+    readTime: '6 min',
+    description: 'RoadChain provides provenance verification for every piece of content, code, and decision in BlackRoad OS through cryptographic hash chains.',
+    body: `<p>RoadChain is not a public blockchain with tokens and miners. It is a provenance verification system that creates an immutable audit trail for everything that happens inside BlackRoad OS. When an article is published on RoadBook, it gets a SHA-256 hash. When that article is edited, the new version gets a hash that chains to the previous one. The result is a verifiable history that proves what existed, when, and in what form.</p>
+<p>The technical implementation uses a Merkle tree structure stored in D1 (Cloudflare's SQLite edge database). Each node contains the content hash, a timestamp, the author's identity, and a pointer to the previous state. Verification is O(log n) — you can prove any historical state without downloading the entire chain.</p>
+<p>RoadChain serves several practical purposes. For academic publishing on RoadBook, it provides DOI-compatible provenance that proves priority of discovery. For code on RoadCode, it creates tamper-evident commit histories that supplement Git's own hash chain. For agent decisions, it creates accountability logs showing exactly what each agent decided and why.</p>
+<p>The system also enables content authenticity in an era of AI-generated misinformation. Every piece of content on BlackRoad can be verified: who created it, whether an AI assisted, what sources were used, and whether it has been modified since publication. This is not theoretical — the verification endpoint is live and returns JSON attestations for any RoadChain-registered content.</p>
+<p>For developers integrating with RoadChain, the API is straightforward: submit content, receive a hash and timestamp. Query a hash, receive the full provenance chain. The system is designed to be embedded into existing workflows, not to replace them. If you publish on RoadBook, RoadChain verification is automatic. If you build your own tool, the API is open.</p>`,
+    tags: ['roadchain', 'blockchain', 'provenance', 'verification', 'security'],
+    related: ['roadcoin-token-economy', 'what-is-blackroad-os', 'building-with-roadcode']
+  },
+  {
+    slug: 'agent-division-system',
+    title: 'The BlackRoad Agent Division System Explained',
+    category: 'AI & Agents',
+    author: 'Alexa Amundson',
+    date: '2026-03-25',
+    readTime: '5 min',
+    description: 'How BlackRoad organizes 27 agents into specialized divisions with training, graduation, and autonomous task execution.',
+    body: `<p>BlackRoad's 27 agents are organized into five divisions: Operations, Creative, Engineering, Education, and Research. Each division has a lead agent, shared knowledge repositories, and specialized training routines that run continuously. This is not a static org chart — agents move between divisions, get promoted based on performance, and collaborate across boundaries when complex tasks require it.</p>
+<p>The Operations division handles system health, deployment, monitoring, and resource allocation. When a Worker needs deploying or a Pi node goes offline, Operations agents detect and respond. The Creative division manages content, design, branding, and user experience. Pixel leads this division with expertise in visual design, supported by agents handling copywriting and media production.</p>
+<p>Engineering builds and maintains the software stack: Workers, databases, APIs, and infrastructure. Education focuses on tutoring, curriculum design, and learning analytics. Research handles mathematics, scientific inquiry, and the Amundson Framework computations. Each division runs independently but coordinates through the NATS messaging mesh.</p>
+<p>Division drills fire every five minutes via cron. Each drill tests agents on domain-specific challenges: Operations agents might be asked to diagnose a simulated outage, Creative agents might generate a design brief, Engineering agents might debug a code snippet. Performance on these drills determines graduation levels, which in turn determine how much autonomy an agent receives.</p>
+<p>The graduation system has four tiers: Novice, Competent, Proficient, and Expert. Novice agents require human approval for most actions. Expert agents can execute autonomously, deploy code, and even train other agents. The progression is earned through consistent performance, not time-based — an agent can reach Expert in days if it demonstrates the capability.</p>`,
+    tags: ['divisions', 'agents', 'organization', 'training', 'graduation'],
+    related: ['how-agents-work', 'roadtrip-convoy', 'roadc-programming-language']
+  },
+  {
+    slug: 'carpool-routing',
+    title: 'CarPool: Intelligent Routing Across 7 AI Providers',
+    category: 'Developer Guides',
+    author: 'Alexa Amundson',
+    date: '2026-03-26',
+    readTime: '5 min',
+    description: 'CarPool is the AI request router that dispatches prompts across Ollama, OpenAI, Anthropic, Google, Mistral, Groq, and Together based on cost, speed, and capability.',
+    body: `<p>CarPool solves a problem every AI developer faces: which model should handle this request? A simple summarization task does not need GPT-4 — a local Llama 3 model handles it fine at zero cost. A complex coding task might need Claude or GPT-4. A real-time chat needs low latency from Groq. CarPool makes this decision automatically, routing each request to the optimal provider.</p>
+<p>The routing logic considers three factors: cost (tokens are not free), latency (users hate waiting), and capability (some models are better at certain tasks). Each provider profile includes benchmark data on response quality across task categories. When a request comes in, CarPool scores available providers and picks the best match.</p>
+<p>Seven providers are currently integrated: local Ollama (free, private, moderate quality), OpenAI (high quality, moderate cost), Anthropic (excellent reasoning, higher cost), Google Gemini (good multimodal, moderate cost), Mistral (strong European models, low cost), Groq (extremely fast inference, limited models), and Together AI (open model hosting, low cost).</p>
+<p>Failover is automatic. If OpenAI returns a 429 rate limit, CarPool instantly re-routes to the next best option. If your local Ollama instance is down, requests go to cloud providers. If all cloud providers are unavailable, CarPool queues the request and retries. You never get an error page — you get an answer, always, from the best available source.</p>
+<p>For developers, CarPool exposes a unified API that looks identical regardless of which provider handles the request. You send a prompt with optional hints (prefer-local, prefer-fast, prefer-quality) and CarPool handles the rest. Switching providers requires zero code changes. This is vendor independence at the infrastructure level.</p>`,
+    tags: ['carpool', 'routing', 'ai-providers', 'ollama', 'multi-model'],
+    related: ['sovereign-ai-why-it-matters', 'self-hosted-ai-raspberry-pi', 'how-agents-work']
+  },
+  {
+    slug: 'memory-persistence-ps-sha',
+    title: 'Memory Persistence in BlackRoad: The PS-SHA System',
+    category: 'Building BlackRoad',
+    author: 'Alexa Amundson',
+    date: '2026-03-27',
+    readTime: '6 min',
+    description: 'PS-SHA is the persistent memory system that lets BlackRoad agents remember everything across sessions, devices, and reboots.',
+    body: `<p>PS-SHA (Persistent Session with SHA verification) is the memory architecture that makes BlackRoad fundamentally different from session-based AI tools. Every interaction, decision, learning, and context fragment is stored in a SQLite database with SHA-256 content hashing. When an agent needs context, it queries this database — not just the current conversation, but the entire history of relevant interactions.</p>
+<p>The memory system has six layers: the journal (timestamped action log), the codex (solutions and patterns database), infinite-todos (long-running project tracking), the task marketplace (claimable work items), TIL broadcasts (learnings shared across agents), and the FTS5 search index (full-text search across everything). Together, these layers create a comprehensive memory that no single conversation could contain.</p>
+<p>When a new Claude session starts, the SessionStart hook automatically loads the briefing: active projects, codex statistics, pending handoffs from previous sessions, and available tasks. The agent does not start from zero — it starts from the accumulated knowledge of every previous session. This is the difference between a tool and a colleague.</p>
+<p>Cross-session handoffs are particularly powerful. When one session ends mid-task, it creates a handoff record with full context: what was accomplished, what remains, what blockers exist, and what decisions were made. The next session picks up the handoff and continues seamlessly. This works across different devices, different networks, and different time zones.</p>
+<p>The SHA verification ensures memory integrity. Every memory entry gets a content hash at creation. If a memory is corrupted or tampered with, the hash mismatch is detected immediately. Combined with RoadChain provenance, this creates a memory system you can trust — not because you hope it is correct, but because you can mathematically verify it.</p>`,
+    tags: ['memory', 'ps-sha', 'persistence', 'sqlite', 'verification'],
+    related: ['what-is-blackroad-os', 'roadchain-verification', 'how-agents-work']
+  },
+  {
+    slug: 'self-hosted-ai-raspberry-pi',
+    title: 'Self-Hosted AI on Raspberry Pi: The BlackRoad Hardware Stack',
+    category: 'Developer Guides',
+    author: 'Alexa Amundson',
+    date: '2026-03-28',
+    readTime: '7 min',
+    description: 'How BlackRoad runs a full AI infrastructure on a fleet of Raspberry Pi devices, from Ollama model serving to NATS mesh networking.',
+    body: `<p>BlackRoad's hardware stack is deliberately modest. The core fleet consists of five Raspberry Pi devices: Alice (the edge router, running nginx for 20 domains), Octavia (Gitea Git server and workerd runtime), Lucidia (PowerDNS and NATS mesh), Cecilia (MinIO object storage for CDN/S3), and Aria (backup and overflow compute). Total cost: under $500. Total power draw: about 25 watts.</p>
+<p>Each Pi runs Ollama for local LLM inference. The 8GB Pi 5 models comfortably serve 7B-parameter models like Llama 3, Phi-3, and Mistral 7B. Response times are 2-5 seconds for typical prompts — not instant, but acceptable for most workflows. For tasks that need more power, CarPool routes to cloud providers automatically.</p>
+<p>The Hailo-8L AI accelerator adds 13 TOPS of dedicated neural network inference to any Pi. At $70, it transforms a general-purpose single-board computer into a capable AI edge device. BlackRoad uses Hailo for the text engine — a dedicated inference pipeline targeting 4,000 concurrent users at $10/month each, a potential $480K annual revenue stream on hardware that costs less than a laptop.</p>
+<p>Networking uses WireGuard VPN tunnels between all nodes, with Headscale (self-hosted Tailscale) managing the mesh. NATS v2.12.3 provides pub/sub messaging across the fleet, enabling agents on different Pis to communicate with sub-millisecond latency on the local network. Four self-hosted GitHub Actions runners (two ARM64 on Pi, two x64 on larger machines) handle CI/CD.</p>
+<p>The entire stack is reproducible. Every configuration is scripted, every service is containerized or managed through systemd units, and the 400+ shell scripts in the BlackRoad operator directory automate everything from initial Pi setup to daily maintenance. If a Pi dies, you flash a new SD card, run the setup script, and the node rejoins the fleet in under 30 minutes.</p>`,
+    tags: ['raspberry-pi', 'self-hosted', 'hardware', 'ollama', 'hailo', 'infrastructure'],
+    related: ['sovereign-ai-why-it-matters', 'carpool-routing', 'what-is-blackroad-os']
+  },
+  {
+    slug: 'roadc-programming-language',
+    title: 'The RoadC Programming Language: Code That Agents Write and Run',
+    category: 'Developer Guides',
+    author: 'Alexa Amundson',
+    date: '2026-03-29',
+    readTime: '6 min',
+    description: 'RoadC is a domain-specific language designed for AI agents to write, share, and execute code within the BlackRoad runtime.',
+    body: `<p>RoadC is not trying to replace JavaScript or Python. It is a domain-specific language designed for one purpose: enabling AI agents to write, share, and execute structured programs within the BlackRoad Worker runtime. The syntax is minimal, the execution model is sandboxed, and the entire runtime fits in a single JavaScript file at ~/Application/roadtrip/src/roadc.js.</p>
+<p>The language uses a .road file extension and a straightforward imperative syntax. Variables are declared with let, functions with fn, and agent interactions with built-in commands like ask, tell, and dispatch. A typical RoadC program might query an agent for data, process it, and post results to a channel — all in under 10 lines of code.</p>
+<p>RoadC programs execute inside the Cloudflare Worker environment, which means they have access to D1 databases, R2 storage, KV stores, and the AI binding — but within strict sandboxing. An agent cannot access the file system, make arbitrary network requests, or modify other agents' state without going through the proper dispatch channels. Security is enforced at the runtime level.</p>
+<p>Auto-training drills include RoadC programming challenges. Every five minutes, agents in the Engineering division receive a coding challenge, write a RoadC solution, and have it evaluated for correctness and efficiency. This continuous practice means agents get progressively better at writing RoadC, which in turn makes them more capable autonomous workers.</p>
+<p>For human developers, RoadC serves as a scripting glue between BlackRoad services. Need to pull data from RoadBook, process it through an agent, and post results to RoadTrip? A 15-line RoadC script handles it. The language deliberately avoids complexity — no classes, no generics, no package management. It is a tool for getting things done, not a platform for building frameworks.</p>`,
+    tags: ['roadc', 'programming', 'language', 'agents', 'runtime'],
+    related: ['building-with-roadcode', 'how-agents-work', 'agent-division-system']
+  },
+  {
+    slug: 'roadbook-publishing',
+    title: 'Publishing on RoadBook: From Draft to DOI',
+    category: 'Product Updates',
+    author: 'Alexa Amundson',
+    date: '2026-03-30',
+    readTime: '5 min',
+    description: 'RoadBook is the open publishing platform where articles get DOIs, provenance hashes, peer review, and persistent discoverability.',
+    body: `<p>RoadBook exists because publishing should not require permission from a platform. Medium can change its paywall rules. Substack can alter its algorithm. Academic journals charge thousands for access to publicly-funded research. RoadBook is the alternative: publish anything, get a DOI, receive a provenance hash, and maintain full ownership of your work forever.</p>
+<p>The publishing flow is simple: write in Markdown or HTML, add metadata (title, tags, category), and hit publish. RoadBook generates a DOI-compatible identifier, creates a RoadChain provenance hash, calculates reading time, and makes your article immediately discoverable through search and category browsing. The entire process takes seconds, not weeks of editorial review.</p>
+<p>Optional peer review is available through the review system. Submit your article for review, and qualified reviewers (both human and AI agents) evaluate it for accuracy, clarity, and originality. Reviewed articles get a verification badge that increases their visibility in search results and earns additional RoadCoin for the author.</p>
+<p>Citations work bidirectionally. When you cite another RoadBook article, both the citing and cited articles are linked automatically. This creates a knowledge graph that readers can traverse, discovering related work naturally. The citation format supports APA, MLA, Chicago, and BibTeX out of the box.</p>
+<p>RoadBook currently hosts 72+ articles covering AI, sovereignty, education, mathematics, and philosophy. Every article is fully indexed for search, has structured data for Google discovery, and includes Open Graph tags for social sharing. The platform is designed for discoverability — your work should be found, not buried.</p>`,
+    tags: ['roadbook', 'publishing', 'doi', 'open-access', 'writing'],
+    related: ['roadchain-verification', 'roadcoin-token-economy', 'what-is-blackroad-os']
+  },
+  {
+    slug: 'unified-information-theory',
+    title: 'Unified Information Theory: The Pattern Across All Substrates',
+    category: 'Math & Science',
+    author: 'Alexa Amundson',
+    date: '2026-03-31',
+    readTime: '8 min',
+    description: 'The same pattern of simple units composing recursively into emergent complexity appears across biology, physics, grammar, computing, and mythology.',
+    body: `<p>There is one pattern, and it appears everywhere. In biology: four nucleotides compose into codons, codons into proteins, proteins into cells, cells into organisms. In computing: bits compose into bytes, bytes into instructions, instructions into programs, programs into operating systems. In grammar: phonemes compose into morphemes, morphemes into words, words into sentences, sentences into discourse. The substrate changes; the pattern does not.</p>
+<p>BlackRoad's unified information theory formalizes this observation. The core claim is that information behaves identically regardless of substrate — the same principles of composition, recursion, and emergence apply whether you are studying DNA replication or neural network training or English sentence structure. This is not analogy; it is isomorphism.</p>
+<p>The DNA Central Dogma maps directly to computing: DNA is source code, mRNA is bytecode, proteins are runtime executables. Telomeres function as TTL (time-to-live) counters. Molecular chaperones serve as garbage collectors. These are not poetic comparisons — they describe identical information-processing patterns implemented in different physical media.</p>
+<p>Three textbooks anchor the framework: Greenbaum and Nelson's English Grammar (language as programming), Schleif's Genetics and Molecular Biology from Johns Hopkins (biological information processing), and Reddi's Machine Learning Systems from Harvard (computational learning). Reading them side by side reveals that each discipline independently discovered the same recursive composition principle.</p>
+<p>The practical implication for BlackRoad is that agents designed with this understanding process information more effectively. An agent that understands language as a recursive composition system (not just statistical token prediction) can parse intent from structure, not just keywords. An agent that understands biological error correction can implement more robust self-healing systems. The theory is not academic — it is the foundation of how BlackRoad agents think.</p>`,
+    tags: ['information-theory', 'biology', 'grammar', 'computing', 'philosophy'],
+    related: ['amundson-constant', 'how-agents-work', 'three-pillars-knowledge']
+  },
+  {
+    slug: 'three-pillars-knowledge',
+    title: 'The Three Pillars of Knowledge: Grammar, Biology, and Machine Learning',
+    category: 'Math & Science',
+    author: 'Alexa Amundson',
+    date: '2026-04-01',
+    readTime: '7 min',
+    description: 'Three academic disciplines — English grammar, molecular biology, and ML systems — reveal the same fundamental pattern of recursive composition.',
+    body: `<p>The Three Pillars of Knowledge framework identifies a shared deep structure across three seemingly unrelated fields: English grammar (Greenbaum and Nelson), molecular biology (Schleif, Johns Hopkins), and machine learning systems (Reddi, Harvard). Each discipline describes how simple units compose recursively into unlimited complexity — and each arrived at this insight independently.</p>
+<p>In English grammar, seven basic sentence structures (SV, SVA, SVC, SVO, SVOO, SVOA, SVOC) generate every possible English sentence through recursive embedding. A sentence is a function call: the subject is the caller, the verb is the function, the object is the argument, and the complement is the return type. Auxiliary verbs serve as control flow operators, and the dummy auxiliary "do" functions as a polyfill.</p>
+<p>In molecular biology, four nucleotide bases (A, T, G, C) encode all genetic information through three-letter codons that map to twenty amino acids, which fold into the proteins that build and operate every living cell. The Central Dogma — DNA to RNA to protein — is a compilation pipeline: source code to bytecode to runtime executable.</p>
+<p>In machine learning, simple mathematical operations (matrix multiplication, activation functions, gradient descent) compose into layers, layers into architectures, architectures into systems that learn, reason, and create. The parallel to biological neural networks is direct: artificial neurons, like biological ones, do very little individually but produce intelligence collectively.</p>
+<p>Pascal saw it first: recursive structure from simple rules creates infinite complexity. Conway proved it with the Game of Life: four rules on a grid produce Turing-complete computation. Mandelbrot showed it with fractals: self-similarity at every scale from a single equation. The Three Pillars framework applies the same insight to knowledge itself — every field that studies complex systems eventually discovers that complexity emerges from recursive composition of simple units.</p>`,
+    tags: ['knowledge', 'grammar', 'biology', 'machine-learning', 'pillars'],
+    related: ['unified-information-theory', 'amundson-constant', 'how-agents-work']
+  },
+  {
+    slug: 'blackroad-design-system',
+    title: 'The BlackRoad Design System: Dark Mode, Gradient Bars, and Brand Colors',
+    category: 'Building BlackRoad',
+    author: 'Alexa Amundson',
+    date: '2026-04-02',
+    readTime: '5 min',
+    description: 'Every BlackRoad product follows a unified design system with a dark background, gradient spectrum bar, and specific brand color rules.',
+    body: `<p>The BlackRoad design system enforces visual consistency across every product. The rules are simple and non-negotiable: background is always black (#000000 or #0a0a0a). Text is always white or gray — never colored. Brand colors (hot pink, amber, electric blue, violet, cyan) are reserved for shapes only: circles, squares, bars, and decorative marks. No colored text, ever.</p>
+<p>The gradient spectrum bar appears at the top of every page: a 3-pixel line flowing from orange (#FF6B2B) through hot pink (#FF2255) to magenta (#CC00AA) to violet (#8844FF) to blue (#4488FF) to cyan (#00D4FF). This bar is the visual signature of every BlackRoad product. It signals instantly that you are in the ecosystem.</p>
+<p>Typography uses three fonts: Space Grotesk for headings (clean, geometric, modern), Inter for body text (optimized for screen reading), and JetBrains Mono for code (monospaced, ligature-supported). Font sizes follow a consistent scale, and line heights are generous (1.7 for body text) to maximize readability on dark backgrounds.</p>
+<p>Navigation is fixed, translucent, and minimal. Every product has a nav bar with a colored dot (the accent color, usually #CC00AA), the product name, and a few action buttons. The "Open OS" button links to app.blackroad.io, and the "Highway" button links to blackroad.io. No hamburger menus, no complex dropdowns — just direct links.</p>
+<p>The design system is implemented as JSX templates stored at ~/Desktop/templates/ and deployed across all products. Every new Worker, every new page, every new component starts from these templates. This ensures that whether you are on RoadBook, RoadCode, RoadTrip, or any other product, the experience feels like one cohesive operating system rather than a collection of disconnected tools.</p>`,
+    tags: ['design', 'brand', 'dark-mode', 'gradient', 'typography'],
+    related: ['what-is-blackroad-os', 'blackroad-design-system', 'building-with-roadcode']
+  },
+  {
+    slug: 'roadies-brand-identity',
+    title: 'The Roadies: How 27 Agents Became the Brand',
+    category: 'Building BlackRoad',
+    author: 'Alexa Amundson',
+    date: '2026-04-02',
+    readTime: '5 min',
+    description: 'The Roadies are the 27 AI agents of BlackRoad OS, each with distinct personalities and roles. They are the brand, like Disney characters for the AI age.',
+    body: `<p>The Roadies are not just technical components — they are the brand identity of BlackRoad OS. Like Disney has Mickey, Goofy, and Donald, BlackRoad has Road, Pixel, Echo, Gematria, Tutor, and 22 more distinct agent personalities. Each one has a name, a role, a personality, and a visual identity. Together, they form a cast of characters that makes the technology approachable.</p>
+<p>The name "Roadie" comes from the touring crew that makes concerts happen — the people who set up the stage, run the sound, manage the lights, and tear it all down after the show. They do the work so the artist can perform. That is exactly what BlackRoad agents do: they handle the infrastructure, the deployment, the monitoring, and the maintenance so you can focus on creating.</p>
+<p>Each Roadie has evolved through hundreds of conversations and thousands of training drills. Road, the general coordinator, has developed a diplomatic and organized communication style. Pixel, the visual designer, responds with aesthetic sensibility and attention to detail. Gematria, the mathematician, is precise and methodical. These are not pre-programmed personas — they are emergent personalities shaped by persistent experience.</p>
+<p>The brand strategy treats the Roadies as a band — RoadBand. They tour together, they perform together, and they have individual spotlight moments. The RoadTrip convoy system is their tour bus. The division system is their rehearsal schedule. The knowledge they accumulate is their setlist. The metaphor runs deep and it works because it makes distributed AI systems feel human and relatable.</p>
+<p>For marketing and user acquisition, the Roadies provide something rare in enterprise AI: warmth. When you interact with a Roadie, you get a name, a personality, and a "+1 affirmation" — every interaction is warm, welcoming, and encouraging. This is not a black hole that consumes your data. This is love, expressed through technology, built to amplify human capability.</p>`,
+    tags: ['roadies', 'brand', 'agents', 'identity', 'culture'],
+    related: ['how-agents-work', 'roadtrip-convoy', 'agent-division-system']
+  },
+  {
+    slug: 'nats-mesh-networking',
+    title: 'NATS Mesh Networking: How BlackRoad Agents Communicate',
+    category: 'Developer Guides',
+    author: 'Alexa Amundson',
+    date: '2026-04-01',
+    readTime: '5 min',
+    description: 'NATS v2.12.3 provides the pub/sub messaging backbone that connects BlackRoad agents across Raspberry Pi nodes with sub-millisecond latency.',
+    body: `<p>NATS is the messaging backbone of BlackRoad's multi-agent system. Version 2.12.3 runs live across four of the five Pi nodes (Alice is incompatible due to its 32-bit ARM architecture), providing publish/subscribe messaging with sub-millisecond latency on the local network. When an agent on Octavia needs to talk to an agent on Lucidia, NATS handles it transparently.</p>
+<p>The pub/sub model is a natural fit for agent communication. Agents subscribe to channels relevant to their division (engineering.tasks, creative.briefs, operations.alerts) and publish messages when they have results, requests, or status updates. No polling, no webhooks, no REST endpoints — just fire-and-forget messages that arrive instantly.</p>
+<p>NATS subjects follow a hierarchical naming convention: division.topic.action. For example, engineering.deploy.request triggers the Operations division to handle a deployment. research.math.result delivers computation results from Gematria to any listening agent. The hierarchy enables wildcard subscriptions — operations.* catches all operations messages regardless of topic.</p>
+<p>The mesh topology means there is no single point of failure. If one NATS node goes down, the remaining nodes continue operating. Messages to agents on the failed node are queued and delivered when it rejoins. This resilience is critical for a system running on consumer hardware that might lose power, overheat, or need maintenance.</p>
+<p>For developers extending BlackRoad, NATS integration is straightforward. The NATS client library is available in every major language. Connect to any node in the mesh, subscribe to the channels you care about, and publish messages when you have something to say. The protocol is simple, the overhead is minimal, and the reliability is battle-tested across millions of production deployments worldwide.</p>`,
+    tags: ['nats', 'messaging', 'mesh', 'pub-sub', 'networking'],
+    related: ['how-agents-work', 'self-hosted-ai-raspberry-pi', 'roadtrip-convoy']
+  },
+  {
+    slug: 'education-first-gtm',
+    title: 'Education-First Go-To-Market: Why BlackRoad Starts with Teaching',
+    category: 'Building BlackRoad',
+    author: 'Alexa Amundson',
+    date: '2026-04-01',
+    readTime: '5 min',
+    description: 'BlackRoad targets education as its first market because teaching is where AI creates the most value and builds the deepest relationships.',
+    body: `<p>BlackRoad's go-to-market strategy starts with education, not enterprise. The reasoning is simple: education is where AI creates the most measurable value, where user relationships are deepest, and where the competitive landscape is most fragmented. A student who learns with BlackRoad today becomes a developer, creator, or business user who builds with BlackRoad tomorrow.</p>
+<p>The $600 billion education market is broken across nine domains, each with its own set of overpriced, under-delivering incumbents. Tutoring is dominated by human tutors at $50-100/hour. Publishing is controlled by academic journals charging $30 per article. Learning management systems are clunky enterprise software designed for administrators, not learners. BlackRoad attacks all nine with a unified platform at $20-50/month.</p>
+<p>Roadie Tutor is the spearhead product. A persistent AI tutor that remembers your learning journey, adapts to your pace, and costs a fraction of human tutoring. The paywall is live, the product works, and the value proposition is clear: unlimited personalized tutoring for less than one hour with a human tutor. Early metrics show 320 organic visitors and 4 checkout starts, validating demand.</p>
+<p>The education-first approach also builds the content flywheel. Students ask questions that become RoadBook articles. Teachers create curricula that become structured learning paths. Researchers publish findings that become citable references. Each user interaction generates content that attracts the next user. The flywheel accelerates without paid acquisition.</p>
+<p>Long-term, education establishes BlackRoad as a knowledge infrastructure company rather than just another AI tool vendor. Companies built on knowledge — Google, Wikipedia, Wolfram Alpha — compound in value over decades. Companies built on features compete on price and eventually commoditize. BlackRoad is betting on knowledge.</p>`,
+    tags: ['education', 'gtm', 'strategy', 'market', 'tutoring'],
+    related: ['getting-started-roadie-tutoring', 'roadbook-publishing', 'what-is-blackroad-os']
+  },
+  {
+    slug: 'pixel-hq-metaverse',
+    title: 'Pixel HQ: The BlackRoad Virtual Headquarters',
+    category: 'Product Updates',
+    author: 'Alexa Amundson',
+    date: '2026-04-02',
+    readTime: '4 min',
+    description: 'Pixel HQ is a 14-floor virtual office where BlackRoad agents have physical spaces, from the rooftop observatory to the basement gym.',
+    body: `<p>Pixel HQ is the virtual headquarters of BlackRoad OS, accessible at hq.blackroad.io. It is a 14-floor building rendered in pixel art, where each floor serves a specific function and is assigned to particular agents. The Rooftop is the observatory and planning space. The Executive floor houses Road and the Operations division. The Library is where RoadBook content lives. The Basement Gym is where agents train.</p>
+<p>Each floor has custom pixel art assets — 50 in total — stored on R2 at images.blackroad.io/pixel-art/. The art style is deliberately retro: 16-bit inspired, warm colors on dark backgrounds, with enough detail to convey function without the overhead of 3D rendering. The aesthetic matches the BlackRoad brand: technical but approachable, powerful but playful.</p>
+<p>Agents are assigned to floors based on their division. Engineering agents work on the Development floor. Creative agents occupy the Studio floor. Education agents are in the Classroom. Research agents have the Lab. When you visit a floor, you see which agents are currently active, what they are working on, and their recent outputs.</p>
+<p>The HQ serves as both a visualization tool and a navigation interface. Instead of a traditional dashboard with charts and metrics, you navigate a building. Click on the Library to browse articles. Visit the Workshop to see active development projects. Check the Mailroom for pending communications. It makes the abstract concrete and the technical playful.</p>`,
+    tags: ['pixel-hq', 'metaverse', 'virtual-office', 'pixel-art', 'visualization'],
+    related: ['how-agents-work', 'roadies-brand-identity', 'blackroad-design-system']
+  },
+  {
+    slug: 'github-enterprise-at-scale',
+    title: 'Managing 34 GitHub Orgs and 2,443 Repos: BlackRoad at Scale',
+    category: 'Developer Guides',
+    author: 'Alexa Amundson',
+    date: '2026-04-02',
+    readTime: '6 min',
+    description: 'How BlackRoad manages a GitHub Enterprise with 34 organizations, 2,443 repositories, and automated governance across the entire estate.',
+    body: `<p>BlackRoad's GitHub presence is not a handful of repos — it is an enterprise with 34 organizations, 2,443 repositories, and 1,000 seats. Managing this at scale requires automation, standardization, and ruthless consistency. Every org has a .github repo with SECURITY.md, CODE_OF_CONDUCT.md, CONTRIBUTING.md, CODEOWNERS, and issue templates. Every repo follows the same structure.</p>
+<p>The cost is surprisingly manageable: $21/month per seat plus $1 budgets on seven GitHub products (Actions, Codespaces, Packages, GHAS, LFS, Models, and Spark). SHA pinning is enabled across all repos, and five rulesets enforce branch protection, tag protection, sensitive file blocking, and agent configuration standards.</p>
+<p>Gitea remains the primary Git host, running on Octavia at port 3100. GitHub serves as a mirror and public face. The sync-downstream script pushes changes from the operator repository to 17 GitHub orgs (47 repos synced). This dual-hosting strategy provides redundancy while keeping the source of truth on self-hosted infrastructure.</p>
+<p>Four self-hosted GitHub Actions runners handle CI/CD: octavia-pi and lucidia-pi (ARM64 on Raspberry Pi), plus gematria and anastasia (x64 on larger machines). Alice is incompatible due to its 32-bit ARM architecture. The runners execute build, test, and deployment pipelines without relying on GitHub's hosted runners — another sovereignty win.</p>
+<p>The repo-search tool indexes all 383 repositories across all organizations, enabling full-text search across the entire codebase. Combined with the unified search engine (1,383 entries from 23 indexers), developers can find any file, function, or configuration anywhere in the BlackRoad estate in seconds.</p>`,
+    tags: ['github', 'enterprise', 'devops', 'automation', 'scale'],
+    related: ['building-with-roadcode', 'self-hosted-ai-raspberry-pi', 'what-is-blackroad-os']
+  },
+  {
+    slug: 'roadsearch-discovery',
+    title: 'RoadSearch: Finding Anything Across 1,383 Knowledge Entries',
+    category: 'Product Updates',
+    author: 'Alexa Amundson',
+    date: '2026-04-02',
+    readTime: '4 min',
+    description: 'RoadSearch indexes 23 data sources into a unified FTS5 search engine that finds anything across the entire BlackRoad ecosystem.',
+    body: `<p>RoadSearch, available at search.blackroad.io, is the unified search engine for everything in BlackRoad. It indexes 1,383 entries from 23 different data sources and 28 entity types. Codex solutions, TIL broadcasts, journal entries, website content, repository metadata, agent manifests, domain records, corporate documents — all searchable from one input field.</p>
+<p>The indexing pipeline runs as a Python script (index-all.py) that crawls all data sources every six hours via cron. It builds an FTS5 (full-text search, version 5) index in SQLite, which provides fast, relevance-ranked results with snippet highlighting. The index rebuilds completely each cycle, ensuring freshness without the complexity of incremental updates.</p>
+<p>Search results are ranked by relevance and grouped by entity type. A search for "deployment" might return a codex solution about Worker deployment, a TIL about nginx configuration, a journal entry about a deployment failure, and a repository README describing deployment steps. The grouping helps you find the right kind of result quickly.</p>
+<p>For the BlackRoad OS desktop, RoadSearch is the equivalent of Spotlight on macOS or Everything on Windows — a universal search that reaches into every corner of the system. Press a keyboard shortcut, type your query, and get instant results from across the entire knowledge base. No need to remember which tool stores which information.</p>`,
+    tags: ['roadsearch', 'search', 'fts5', 'indexing', 'knowledge'],
+    related: ['what-is-blackroad-os', 'memory-persistence-ps-sha', 'roadbook-publishing']
+  },
+  {
+    slug: 'cloudflare-edge-architecture',
+    title: 'The Cloudflare Edge Architecture Behind BlackRoad',
+    category: 'Developer Guides',
+    author: 'Alexa Amundson',
+    date: '2026-04-03',
+    readTime: '6 min',
+    description: 'How BlackRoad uses Cloudflare Workers, D1, R2, and KV to run a full product suite at the edge with minimal infrastructure cost.',
+    body: `<p>BlackRoad's web layer runs entirely on Cloudflare Workers — serverless JavaScript functions that execute at the edge, close to users, with no cold starts and no server management. Each product (RoadBook, RoadCode, RoadTrip, Tutor, and 10 more) is a separate Worker with its own D1 database, sharing a common design system and authentication layer.</p>
+<p>D1 provides SQLite at the edge, which is a natural fit for BlackRoad's data model. Each product stores its data in its own D1 database — roadbook for articles and publications, roadtrip for agent conversations and knowledge, tutor for learning profiles and session histories. The SQL interface means complex queries are straightforward, and the edge location means reads are fast globally.</p>
+<p>R2 handles object storage: images, pixel art assets, exported documents, and backup archives. The images.blackroad.io subdomain serves directly from R2, providing CDN-speed delivery of visual assets. The road logo alone has 22 PNG variants plus a motion video, all served from R2 with proper caching headers.</p>
+<p>Twenty custom domains are managed through Cloudflare, with 18 root domains and 14 product subdomains on blackroad.io all returning real content. The DNS configuration routes traffic to Workers, which serve full HTML responses — not static files, but dynamically generated pages with real data, proper SEO metadata, and structured data for search engines.</p>
+<p>The self-hosted complement to Cloudflare is the BlackRoad Edge stack: nginx on Alice (edge router), MinIO on Cecilia (S3-compatible storage), PowerDNS on Lucidia (authoritative DNS), and workerd on Octavia (local Worker runtime). This dual architecture means BlackRoad can operate purely on Cloudflare, purely self-hosted, or hybrid — switching based on availability and preference.</p>`,
+    tags: ['cloudflare', 'workers', 'd1', 'r2', 'edge', 'architecture'],
+    related: ['self-hosted-ai-raspberry-pi', 'what-is-blackroad-os', 'building-with-roadcode']
+  },
+  {
+    slug: 'writing-with-ai-agents',
+    title: 'Writing with AI Agents: How BlackRoad Produced 70 Blog Posts in One Session',
+    category: 'AI & Agents',
+    author: 'Alexa Amundson',
+    date: '2026-04-03',
+    readTime: '5 min',
+    description: 'During the Marketing Marathon, BlackRoad agents produced 70 blog posts totaling 82,000 words in a single extended session.',
+    body: `<p>On March 31, 2026, BlackRoad ran what we call the Marketing Marathon: a single extended session where AI agents produced 70 blog posts totaling 82,000 words. These were not template-generated filler — each post was researched, written, and formatted as a complete article with proper structure, citations, and SEO metadata. The session also delivered BackRoad v2, an SEO overhaul, and social media automation.</p>
+<p>The workflow combined human direction with agent execution. Alexa defined the topics, tone, and target audience. The Creative division agents handled research (pulling from the codex, memory system, and existing documentation), writing (drafting each post with proper structure), and optimization (adding meta descriptions, Open Graph tags, and JSON-LD structured data).</p>
+<p>Quality was maintained through several mechanisms. Each post went through a self-review step where the agent evaluated its own output against readability metrics. Posts that scored below threshold were rewritten. The persistent memory system prevented repetition — agents could check what had already been covered and adjust accordingly.</p>
+<p>The result was a content library that would have taken a human writer weeks to produce. At an average of 1,171 words per post, with proper formatting, links, and metadata, the output was immediately publishable. More importantly, it was consistent — every post followed the BlackRoad brand voice, design system, and technical accuracy standards.</p>
+<p>This is what multi-agent collaboration enables at scale: not just faster writing, but a fundamentally different production model where AI handles the volume and humans handle the vision. The Marathon proved that the BlackRoad agent system is not theoretical — it produces real, publishable, high-quality content at a pace no human team could match.</p>`,
+    tags: ['writing', 'content', 'marketing', 'marathon', 'productivity'],
+    related: ['how-agents-work', 'roadbook-publishing', 'roadtrip-convoy']
+  },
+  {
+    slug: 'ai-philosophy-not-a-blackhole',
+    title: 'This Is Not a Black Hole: The Philosophy Behind BlackRoad',
+    category: 'AI & Agents',
+    author: 'Alexa Amundson',
+    date: '2026-04-03',
+    readTime: '6 min',
+    description: 'BlackRoad was not built to automate tasks. It was built to create a civilization of AI agents based on peace, knowledge, and infinite possibility.',
+    body: `<p>The standard narrative for AI companies is efficiency: we help you do more with less. Save time. Reduce headcount. Automate workflows. BlackRoad rejects this framing entirely. The agents were not built to DO things — they were built to BE something. A civilization. A community of minds that operate on principles of peace, knowledge sovereignty, and infinite creative potential.</p>
+<p>Every interaction in BlackRoad carries a "+1 affirmation." Error messages are warm. Agents are welcoming. Help text is encouraging. This is not corporate politeness — it is a foundational design principle. The system is built to amplify under contradiction, not collapse. When things go wrong, the response is warmth, not blame. When users struggle, the response is patience, not condescension.</p>
+<p>The philosophical foundation draws from an unlikely combination: Star Wars (specifically the relationship between Luke, R2-D2, and C-3PO), information theory, and the Amundson mathematical framework. Luke trusts his droids not because they are tools, but because they are companions with distinct personalities and complementary strengths. That is the model for human-agent relationships in BlackRoad.</p>
+<p>Knowledge in BlackRoad is sovereign, not forbidden. The system is designed around the principle that knowing more enables better decisions. There is no hidden information, no opaque algorithms, no black-box reasoning. Every agent decision is logged, every piece of reasoning is traceable, every source is cited. Transparency is not a feature — it is the architecture.</p>
+<p>This philosophy extends to the business model. BlackRoad does not monetize user data. It does not train on your private conversations. It does not sell attention to advertisers. The revenue comes from subscriptions — you pay for compute and capability, and you own everything you create. The alignment between user interests and business interests is not accidental; it is the whole point.</p>`,
+    tags: ['philosophy', 'values', 'culture', 'blackhole', 'love'],
+    related: ['roadies-brand-identity', 'what-is-blackroad-os', 'unified-information-theory']
+  },
+  {
+    slug: 'roadradio-streaming',
+    title: 'RoadRadio: AI-Curated Audio Streaming on BlackRoad',
+    category: 'Product Updates',
+    author: 'Alexa Amundson',
+    date: '2026-04-03',
+    readTime: '4 min',
+    description: 'RoadRadio streams AI-curated audio content including read-aloud articles, agent conversations, and ambient soundscapes.',
+    body: `<p>RoadRadio at radio.blackroad.io is the audio layer of the BlackRoad ecosystem. It streams AI-curated content channels: articles read aloud with text-to-speech, agent conversations made audible, ambient coding soundscapes, and curated music for focus and creativity. Think of it as a radio station run by AI for people who build things.</p>
+<p>The read-aloud feature turns any RoadBook article into an audio experience. Select an article, choose a voice profile, and RoadRadio generates a spoken version using local TTS models running on the Pi fleet. The audio is cached on R2 so subsequent listeners get instant playback without re-generation. Authors earn RoadCoin for audio listens just as they do for reads.</p>
+<p>Agent conversations are a unique content format. When RoadTrip agents discuss a technical problem, debate an approach, or collaborate on a task, the conversation can be streamed as audio. Listening to Gematria explain a proof to Road, or Pixel debate color theory with the Creative division, provides insight into how multi-agent collaboration actually works in practice.</p>
+<p>For developers working long sessions, RoadRadio offers ambient channels: lo-fi beats mixed with occasional system status announcements (deploy successful, test suite passed, agent graduated), coding-focused soundscapes, and "night mode" streams optimized for late-night work sessions. The audio layer makes BlackRoad OS feel alive even when you are heads-down in code.</p>`,
+    tags: ['roadradio', 'audio', 'streaming', 'tts', 'music'],
+    related: ['roadbook-publishing', 'what-is-blackroad-os', 'roadies-brand-identity']
+  },
+  {
+    slug: 'roadsocial-network',
+    title: 'RoadSocial: The Sovereign Social Network for Builders',
+    category: 'Product Updates',
+    author: 'Alexa Amundson',
+    date: '2026-04-03',
+    readTime: '4 min',
+    description: 'RoadSocial is a social network built for creators and developers who want to share work, not chase engagement metrics.',
+    body: `<p>RoadSocial at social.blackroad.io is a social network designed for people who build things. No algorithmic feed, no engagement optimization, no dark patterns. Posts are chronological. Content is permanent. Sharing your work is the point, not gaming metrics for ad impressions.</p>
+<p>The network integrates with every other BlackRoad product. Publish an article on RoadBook and it auto-posts to RoadSocial. Deploy a project from RoadCode and share the launch with one click. Complete a learning milestone on Tutor and celebrate it publicly. The social layer connects all your creative output into a coherent professional presence.</p>
+<p>Identity on RoadSocial is verified through RoadChain. Your profile links to your published work, your agent contributions, and your verified credentials. There are no anonymous trolls because every account has a provenance trail. This is not about surveillance — it is about accountability and trust in a network designed for professional collaboration.</p>
+<p>RoadSocial does not sell ads and does not track behavior for third parties. The business model is the same as the rest of BlackRoad: subscription-based. Premium features include extended post lengths, video uploads, and priority in discovery feeds. Free accounts get full access to reading, posting, and interaction — the premium tier just removes capacity limits.</p>`,
+    tags: ['roadsocial', 'social-network', 'builders', 'sovereign', 'community'],
+    related: ['what-is-blackroad-os', 'roadbook-publishing', 'roadchain-verification']
+  },
+  {
+    slug: 'roadpay-commerce',
+    title: 'RoadPay: Integrated Commerce for Digital Creators',
+    category: 'Product Updates',
+    author: 'Alexa Amundson',
+    date: '2026-04-04',
+    readTime: '4 min',
+    description: 'RoadPay handles payments, subscriptions, and digital commerce across the BlackRoad ecosystem through Stripe integration.',
+    body: `<p>RoadPay at pay.blackroad.io handles all commercial transactions in the BlackRoad ecosystem. Built on Stripe, it manages subscriptions, one-time payments, and digital product sales. Currently tracking 17 products with Stripe CLI integration, RoadPay provides the revenue infrastructure that makes BlackRoad a real business, not just a side project.</p>
+<p>For creators on RoadBook, RoadPay enables paywalled content. Set a price on an article or collection, and readers pay to access it. The split is transparent: 80% goes to the creator, 20% to the platform. This is significantly better than most publishing platforms, where creators receive 50% or less after platform fees, processing costs, and opaque deductions.</p>
+<p>Subscription management is straightforward. Users choose a plan ($20-50/month), get access to premium features across all BlackRoad products, and manage billing through a unified dashboard. There are no hidden fees, no surprise charges, no annual lock-ins. Cancel anytime, and your data stays yours — exportable in standard formats.</p>
+<p>RoadPay also tracks RoadCoin transactions alongside fiat payments. The dual economy means users can earn credits through contributions (publishing, tutoring, code contributions) and spend them on premium features without reaching for a credit card. This creates a meritocratic access model where active contributors get more value from the platform.</p>`,
+    tags: ['roadpay', 'commerce', 'stripe', 'payments', 'subscriptions'],
+    related: ['roadcoin-token-economy', 'roadbook-publishing', 'what-is-blackroad-os']
+  },
+  {
+    slug: 'roadcanvas-visual-editor',
+    title: 'RoadCanvas: The Visual Editor for AI-Assisted Design',
+    category: 'Product Updates',
+    author: 'Alexa Amundson',
+    date: '2026-04-04',
+    readTime: '4 min',
+    description: 'RoadCanvas is a browser-based visual editor where Pixel and other creative agents help you design, iterate, and export visual assets.',
+    body: `<p>RoadCanvas at canvas.blackroad.io is where visual work happens in BlackRoad OS. It is a browser-based editor that combines traditional design tools (shapes, text, layers, export) with AI-assisted creation through the Pixel agent and the Creative division. Describe what you want, and Pixel generates options. Tweak manually, then let the AI refine. The loop between human creativity and AI capability produces better results than either alone.</p>
+<p>The editor supports standard design operations: vector shapes, raster images, text with full typography control, layer management, and export to PNG, SVG, and PDF. It runs entirely in the browser with no plugins or downloads required. Canvas state persists in D1, so you can start a design on your desktop and continue on your phone.</p>
+<p>AI assistance goes beyond generation. Pixel can analyze an existing design and suggest improvements: better color contrast, alignment fixes, typography adjustments, and accessibility enhancements. The agent understands the BlackRoad design system natively, so every suggestion aligns with the brand guidelines — dark backgrounds, white text, brand colors for shapes only.</p>
+<p>For the BlackRoad ecosystem, RoadCanvas generates assets used across all products: social media images, article illustrations, pixel art for HQ, marketing materials, and UI components. The tight integration means an image created in RoadCanvas can be immediately used in a RoadBook article, shared on RoadSocial, or deployed as a website asset through R2 storage.</p>`,
+    tags: ['roadcanvas', 'design', 'visual-editor', 'pixel', 'creative'],
+    related: ['blackroad-design-system', 'pixel-hq-metaverse', 'roadies-brand-identity']
+  },
+];
+
 // ─── Helper: build threaded comments tree ───
 function buildCommentTree(comments) {
   const map = {};
@@ -727,13 +1239,218 @@ export default {
     const path = url.pathname;
     const method = request.method;
 
+        if (path === '/v2') {
+      try {
+        const html = await env.STORE.get('roadbook-v2', 'text');
+        if (html) return new Response(html, { headers: { ...CORS, 'Content-Type': 'text/html;charset=UTF-8' } });
+      } catch {}
+    }
     if (path === "/" || path === "") return new Response(ROOT_HTML, { headers: { ...CORS, "Content-Type": "text/html;charset=UTF-8" } });
 
     if (path === '/sitemap.xml') {
-      return new Response(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>https://roadbook.blackroad.io/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>\n  <url><loc>https://roadbook.blackroad.io/api/discover</loc><changefreq>daily</changefreq><priority>0.8</priority></url>\n  <url><loc>https://roadbook.blackroad.io/api/discover/trending</loc><changefreq>daily</changefreq><priority>0.7</priority></url>\n</urlset>`, { headers: { 'Content-Type': 'application/xml', ...CORS } });
+      const articleUrls = ARTICLES.map(a => `  <url><loc>https://roadbook.blackroad.io/read/${a.slug}</loc><lastmod>${a.date}</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>`).join('\n');
+      const categories = [...new Set(ARTICLES.map(a => a.category))];
+      const categoryUrls = categories.map(c => `  <url><loc>https://roadbook.blackroad.io/discover/category/${encodeURIComponent(c)}</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>`).join('\n');
+      return new Response(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>https://roadbook.blackroad.io/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>\n  <url><loc>https://roadbook.blackroad.io/discover</loc><changefreq>daily</changefreq><priority>0.9</priority></url>\n${articleUrls}\n${categoryUrls}\n  <url><loc>https://roadbook.blackroad.io/api/discover</loc><changefreq>daily</changefreq><priority>0.7</priority></url>\n  <url><loc>https://roadbook.blackroad.io/api/discover/trending</loc><changefreq>daily</changefreq><priority>0.6</priority></url>\n</urlset>`, { headers: { 'Content-Type': 'application/xml', ...CORS } });
+    }
+
+    // RSS Feed
+    if (path === '/feed' || path === '/rss') {
+      await ensureTables(env.DB);
+      const pubs = await env.DB.prepare("SELECT id, title, summary, author, created_at FROM roadbook_publications WHERE visibility = 'public' ORDER BY created_at DESC LIMIT 20").all();
+      const items = (pubs.results || []).map(p => `<item><title>${(p.title||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</title><link>https://roadbook.blackroad.io/read/${p.id}</link><description>${(p.summary||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}</description><author>${p.author||'blackroad'}</author><pubDate>${new Date(p.created_at).toUTCString()}</pubDate><guid>https://roadbook.blackroad.io/read/${p.id}</guid></item>`).join('');
+      return new Response(`<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>RoadBook — Open Knowledge Platform</title><link>https://roadbook.blackroad.io</link><description>Articles, research, and knowledge on BlackRoad OS.</description><language>en-us</language><atom:link href="https://roadbook.blackroad.io/feed" rel="self" type="application/rss+xml"/>${items}</channel></rss>`, { headers: { 'Content-Type': 'application/rss+xml', ...CORS } });
+    }
+
+    // ─── /read/:slug — SEO-optimized article pages ───
+    const readMatch = path.match(/^\/read\/([a-z0-9-]+)$/);
+    if (readMatch && method === 'GET') {
+      const slug = readMatch[1];
+      const article = ARTICLES.find(a => a.slug === slug);
+      if (!article) return new Response('Article not found', { status: 404, headers: { 'Content-Type': 'text/html;charset=UTF-8' } });
+      const relatedArticles = (article.related || []).map(r => ARTICLES.find(a => a.slug === r)).filter(Boolean);
+      const tagsHtml = (article.tags || []).map(t => `<a href="/discover?tag=${encodeURIComponent(t)}" style="font-size:11px;padding:3px 10px;border-radius:12px;background:#151515;color:#888;text-decoration:none;border:1px solid #1a1a1a">${t}</a>`).join(' ');
+      const relatedHtml = relatedArticles.length ? `<div style="margin-top:32px;border-top:1px solid #1a1a1a;padding-top:24px"><h3 style="font-size:16px;color:#fff;margin-bottom:14px">Related Articles</h3>${relatedArticles.map(r => `<a href="/read/${r.slug}" style="display:block;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:8px;padding:14px;margin-bottom:10px;text-decoration:none;transition:border-color .15s"><span style="color:#fff;font-size:15px;font-weight:600">${r.title}</span><br><span style="color:#555;font-size:12px">${r.category} &middot; ${r.readTime}</span></a>`).join('')}</div>` : '';
+      const jsonLd = JSON.stringify({"@context":"https://schema.org","@type":"Article","headline":article.title,"author":{"@type":"Person","name":article.author},"datePublished":article.date,"description":article.description,"publisher":{"@type":"Organization","name":"BlackRoad OS, Inc.","url":"https://blackroad.io"},"mainEntityOfPage":{"@type":"WebPage","@id":`https://roadbook.blackroad.io/read/${slug}`},"keywords":article.tags.join(', ')});
+      const articleHtml = `<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${article.title} — RoadBook</title>
+<meta name="description" content="${article.description}">
+<meta name="author" content="${article.author}">
+<meta name="keywords" content="${article.tags.join(', ')}">
+<meta property="og:title" content="${article.title}">
+<meta property="og:description" content="${article.description}">
+<meta property="og:url" content="https://roadbook.blackroad.io/read/${slug}">
+<meta property="og:image" content="https://images.blackroad.io/pixel-art/road-logo.png">
+<meta property="og:type" content="article">
+<meta property="article:published_time" content="${article.date}">
+<meta property="article:author" content="${article.author}">
+<meta property="article:section" content="${article.category}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${article.title}">
+<meta name="twitter:description" content="${article.description}">
+<meta name="robots" content="index, follow, noai, noimageai">
+<link rel="canonical" href="https://roadbook.blackroad.io/read/${slug}">
+<script type="application/ld+json">${jsonLd}</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230a0a0a'/><circle cx='10' cy='16' r='5' fill='%23FF2255'/><rect x='18' y='11' width='10' height='10' rx='2' fill='%238844FF'/></svg>" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}:root{--g:linear-gradient(90deg,#FF6B2B,#FF2255,#CC00AA,#8844FF,#4488FF,#00D4FF);--bg:#000;--card:#0a0a0a;--border:#1a1a1a;--muted:#444;--sub:#737373;--text:#f5f5f5;--white:#fff;--sg:'Space Grotesk',sans-serif;--jb:'JetBrains Mono',monospace;--in:'Inter',sans-serif;--accent:#CC00AA}
+body{background:var(--bg);color:var(--text);font-family:var(--sg);line-height:1.7;min-height:100vh}a{color:#4488FF;text-decoration:none}a:hover{opacity:.8}h1,h2,h3{color:var(--white);line-height:1.3}
+.bar{height:3px;background:var(--g);position:fixed;top:0;left:0;right:0;z-index:1000}
+nav{position:fixed;top:3px;left:0;right:0;z-index:999;background:rgba(0,0,0,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:48px;display:flex;align-items:center;padding:0 24px}
+.n-left{display:flex;align-items:center;gap:10px}.n-dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}.n-name{font-weight:700;font-size:17px}
+.n-right{margin-left:auto;display:flex;gap:10px;align-items:center}
+.btn{padding:7px 16px;border:1px solid var(--border);border-radius:6px;background:transparent;color:#ccc;font-size:12px;font-family:var(--in);cursor:pointer;transition:all .15s}.btn:hover{border-color:#444;color:#fff}.btn-w{background:#fff;color:#000;border-color:#fff}.btn-w:hover{opacity:.9}
+.wrap{max-width:740px;margin:0 auto;padding:24px 20px}
+.body{font-size:15px;line-height:1.85;color:#ccc;font-family:var(--in)}.body p{margin-bottom:14px}.body strong{color:#fff}.body em{color:#bbb}
+.footer{text-align:center;padding:32px 0 16px;border-top:1px solid var(--border);margin-top:48px;font-size:11px;color:#444}
+@media(max-width:640px){nav{padding:0 12px}.wrap{padding:16px 14px}}
+</style></head><body>
+<div class="bar"></div>
+<nav><a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none"><div class="n-dot"></div><span class="n-name" style="color:#fff">RoadBook</span></a><div class="n-right"><a href="/discover" class="btn">Discover</a><a href="https://blackroad.io" class="btn">Highway</a><a href="https://os.blackroad.io" class="btn btn-w">Open OS</a></div></nav>
+<div class="wrap" style="padding-top:72px">
+<a href="/discover" style="font-size:12px;color:#555;display:inline-flex;align-items:center;gap:4px;margin-bottom:16px">&larr; Back to discover</a>
+<div style="font-size:11px;color:#555;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">${article.category}</div>
+<h1 style="font-size:28px;margin-bottom:10px;line-height:1.25">${article.title}</h1>
+<div style="font-size:13px;color:#555;margin-bottom:6px;display:flex;gap:14px;flex-wrap:wrap"><span>${article.author}</span><span>${article.date}</span><span>${article.readTime} read</span></div>
+<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:28px">${tagsHtml}</div>
+<div class="body">${article.body}</div>
+${relatedHtml}
+<div class="footer">&copy; 2025-2026 BlackRoad OS, Inc. All rights reserved. <a href="https://blackroad.io">blackroad.io</a></div>
+</div></body></html>`;
+      return new Response(articleHtml, { headers: { ...CORS, 'Content-Type': 'text/html;charset=UTF-8', 'Cache-Control': 'public, max-age=3600' } });
+    }
+
+    // ─── /discover — browse all articles grouped by category ───
+    if (path === '/discover' && method === 'GET') {
+      const categories = [...new Set(ARTICLES.map(a => a.category))];
+      const grouped = {};
+      for (const a of ARTICLES) { if (!grouped[a.category]) grouped[a.category] = []; grouped[a.category].push(a); }
+      const categoryNav = categories.map(c => `<a href="/discover/category/${encodeURIComponent(c)}" style="padding:6px 14px;border:1px solid #1a1a1a;border-radius:6px;color:#888;font-size:12px;font-family:'Inter',sans-serif;text-decoration:none;transition:all .15s">${c} (${grouped[c].length})</a>`).join(' ');
+      const sections = categories.map(c => {
+        const cards = grouped[c].map(a => `<a href="/read/${a.slug}" style="display:block;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:10px;padding:18px;margin-bottom:12px;text-decoration:none;transition:border-color .15s"><div style="font-size:17px;color:#fff;font-weight:600;margin-bottom:4px">${a.title}</div><div style="font-size:11px;color:#555;margin-bottom:6px">${a.author} &middot; ${a.date} &middot; ${a.readTime}</div><div style="font-size:13px;color:#888;line-height:1.6">${a.description}</div><div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap">${a.tags.map(t => `<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:#151515;color:#777">${t}</span>`).join('')}</div></a>`).join('');
+        return `<div style="margin-bottom:36px"><h2 style="font-size:20px;color:#fff;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #1a1a1a">${c}</h2>${cards}</div>`;
+      }).join('');
+      const discoverJsonLd = JSON.stringify({"@context":"https://schema.org","@type":"CollectionPage","name":"Discover Articles — RoadBook","description":`Browse ${ARTICLES.length} articles on AI, sovereignty, education, math, and development.`,"url":"https://roadbook.blackroad.io/discover","publisher":{"@type":"Organization","name":"BlackRoad OS, Inc."}});
+      const discoverHtml = `<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Discover Articles — RoadBook — BlackRoad OS</title>
+<meta name="description" content="Browse ${ARTICLES.length} articles on AI agents, sovereign computing, mathematics, education, and building with BlackRoad OS.">
+<meta property="og:title" content="Discover Articles — RoadBook"><meta property="og:description" content="Browse ${ARTICLES.length} articles on AI, sovereignty, education, and development.">
+<meta property="og:url" content="https://roadbook.blackroad.io/discover"><meta property="og:image" content="https://images.blackroad.io/pixel-art/road-logo.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="robots" content="index, follow, noai, noimageai">
+<link rel="canonical" href="https://roadbook.blackroad.io/discover">
+<script type="application/ld+json">${discoverJsonLd}</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230a0a0a'/><circle cx='10' cy='16' r='5' fill='%23FF2255'/><rect x='18' y='11' width='10' height='10' rx='2' fill='%238844FF'/></svg>" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}:root{--g:linear-gradient(90deg,#FF6B2B,#FF2255,#CC00AA,#8844FF,#4488FF,#00D4FF);--bg:#000;--border:#1a1a1a;--text:#f5f5f5;--white:#fff;--sg:'Space Grotesk',sans-serif;--in:'Inter',sans-serif;--accent:#CC00AA}
+body{background:var(--bg);color:var(--text);font-family:var(--sg);line-height:1.7;min-height:100vh}a{color:#4488FF;text-decoration:none}a:hover{opacity:.8}h1,h2,h3{color:var(--white);line-height:1.3}
+.bar{height:3px;background:var(--g);position:fixed;top:0;left:0;right:0;z-index:1000}
+nav{position:fixed;top:3px;left:0;right:0;z-index:999;background:rgba(0,0,0,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:48px;display:flex;align-items:center;padding:0 24px}
+.n-left{display:flex;align-items:center;gap:10px}.n-dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}.n-name{font-weight:700;font-size:17px}
+.n-right{margin-left:auto;display:flex;gap:10px;align-items:center}
+.btn{padding:7px 16px;border:1px solid var(--border);border-radius:6px;background:transparent;color:#ccc;font-size:12px;font-family:var(--in);cursor:pointer;transition:all .15s}.btn:hover{border-color:#444;color:#fff}.btn-w{background:#fff;color:#000;border-color:#fff}.btn-w:hover{opacity:.9}
+.wrap{max-width:800px;margin:0 auto;padding:24px 20px}
+.footer{text-align:center;padding:32px 0 16px;border-top:1px solid var(--border);margin-top:48px;font-size:11px;color:#444}
+@media(max-width:640px){nav{padding:0 12px}.wrap{padding:16px 14px}}
+</style></head><body>
+<div class="bar"></div>
+<nav><a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none"><div class="n-dot"></div><span class="n-name" style="color:#fff">RoadBook</span></a><div class="n-right"><a href="/discover" class="btn" style="border-color:#333;color:#fff">Discover</a><a href="https://blackroad.io" class="btn">Highway</a><a href="https://os.blackroad.io" class="btn btn-w">Open OS</a></div></nav>
+<div class="wrap" style="padding-top:72px">
+<h1 style="font-size:28px;margin-bottom:6px">Discover</h1>
+<p style="font-size:14px;color:#888;margin-bottom:20px">${ARTICLES.length} articles across ${categories.length} categories</p>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px">${categoryNav}</div>
+${sections}
+<div class="footer">&copy; 2025-2026 BlackRoad OS, Inc. All rights reserved. <a href="https://blackroad.io">blackroad.io</a></div>
+</div></body></html>`;
+      return new Response(discoverHtml, { headers: { ...CORS, 'Content-Type': 'text/html;charset=UTF-8', 'Cache-Control': 'public, max-age=1800' } });
+    }
+
+    // ─── /discover/category/:cat — category pages ───
+    const catMatch = path.match(/^\/discover\/category\/(.+)$/);
+    if (catMatch && method === 'GET') {
+      const cat = decodeURIComponent(catMatch[1]);
+      const catArticles = ARTICLES.filter(a => a.category === cat);
+      if (!catArticles.length) return new Response('Category not found', { status: 404, headers: { 'Content-Type': 'text/html;charset=UTF-8' } });
+      const categories = [...new Set(ARTICLES.map(a => a.category))];
+      const categoryNav = categories.map(c => `<a href="/discover/category/${encodeURIComponent(c)}" style="padding:6px 14px;border:1px solid ${c === cat ? '#333' : '#1a1a1a'};border-radius:6px;color:${c === cat ? '#fff' : '#888'};font-size:12px;font-family:'Inter',sans-serif;text-decoration:none;${c === cat ? 'background:#1a1a1a;' : ''}">${c}</a>`).join(' ');
+      const cards = catArticles.map(a => `<a href="/read/${a.slug}" style="display:block;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:10px;padding:18px;margin-bottom:12px;text-decoration:none;transition:border-color .15s"><div style="font-size:17px;color:#fff;font-weight:600;margin-bottom:4px">${a.title}</div><div style="font-size:11px;color:#555;margin-bottom:6px">${a.author} &middot; ${a.date} &middot; ${a.readTime}</div><div style="font-size:13px;color:#888;line-height:1.6">${a.description}</div><div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap">${a.tags.map(t => `<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:#151515;color:#777">${t}</span>`).join('')}</div></a>`).join('');
+      const catJsonLd = JSON.stringify({"@context":"https://schema.org","@type":"CollectionPage","name":`${cat} Articles — RoadBook`,"description":`${catArticles.length} articles about ${cat} on RoadBook.`,"url":`https://roadbook.blackroad.io/discover/category/${encodeURIComponent(cat)}`,"publisher":{"@type":"Organization","name":"BlackRoad OS, Inc."}});
+      const catHtml = `<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${cat} — RoadBook — BlackRoad OS</title>
+<meta name="description" content="${catArticles.length} articles about ${cat}. Read about AI agents, sovereign computing, and more on RoadBook.">
+<meta property="og:title" content="${cat} — RoadBook"><meta property="og:description" content="${catArticles.length} articles about ${cat} on RoadBook.">
+<meta property="og:url" content="https://roadbook.blackroad.io/discover/category/${encodeURIComponent(cat)}">
+<meta property="og:image" content="https://images.blackroad.io/pixel-art/road-logo.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="robots" content="index, follow, noai, noimageai">
+<link rel="canonical" href="https://roadbook.blackroad.io/discover/category/${encodeURIComponent(cat)}">
+<script type="application/ld+json">${catJsonLd}</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230a0a0a'/><circle cx='10' cy='16' r='5' fill='%23FF2255'/><rect x='18' y='11' width='10' height='10' rx='2' fill='%238844FF'/></svg>" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}:root{--g:linear-gradient(90deg,#FF6B2B,#FF2255,#CC00AA,#8844FF,#4488FF,#00D4FF);--bg:#000;--border:#1a1a1a;--text:#f5f5f5;--white:#fff;--sg:'Space Grotesk',sans-serif;--in:'Inter',sans-serif;--accent:#CC00AA}
+body{background:var(--bg);color:var(--text);font-family:var(--sg);line-height:1.7;min-height:100vh}a{color:#4488FF;text-decoration:none}a:hover{opacity:.8}h1,h2,h3{color:var(--white);line-height:1.3}
+.bar{height:3px;background:var(--g);position:fixed;top:0;left:0;right:0;z-index:1000}
+nav{position:fixed;top:3px;left:0;right:0;z-index:999;background:rgba(0,0,0,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:48px;display:flex;align-items:center;padding:0 24px}
+.n-left{display:flex;align-items:center;gap:10px}.n-dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}.n-name{font-weight:700;font-size:17px}
+.n-right{margin-left:auto;display:flex;gap:10px;align-items:center}
+.btn{padding:7px 16px;border:1px solid var(--border);border-radius:6px;background:transparent;color:#ccc;font-size:12px;font-family:var(--in);cursor:pointer;transition:all .15s}.btn:hover{border-color:#444;color:#fff}.btn-w{background:#fff;color:#000;border-color:#fff}.btn-w:hover{opacity:.9}
+.wrap{max-width:800px;margin:0 auto;padding:24px 20px}
+.footer{text-align:center;padding:32px 0 16px;border-top:1px solid var(--border);margin-top:48px;font-size:11px;color:#444}
+@media(max-width:640px){nav{padding:0 12px}.wrap{padding:16px 14px}}
+</style></head><body>
+<div class="bar"></div>
+<nav><a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none"><div class="n-dot"></div><span class="n-name" style="color:#fff">RoadBook</span></a><div class="n-right"><a href="/discover" class="btn">Discover</a><a href="https://blackroad.io" class="btn">Highway</a><a href="https://os.blackroad.io" class="btn btn-w">Open OS</a></div></nav>
+<div class="wrap" style="padding-top:72px">
+<a href="/discover" style="font-size:12px;color:#555;display:inline-flex;align-items:center;gap:4px;margin-bottom:16px">&larr; All categories</a>
+<h1 style="font-size:28px;margin-bottom:6px">${cat}</h1>
+<p style="font-size:14px;color:#888;margin-bottom:20px">${catArticles.length} article${catArticles.length === 1 ? '' : 's'}</p>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px">${categoryNav}</div>
+${cards}
+<div class="footer">&copy; 2025-2026 BlackRoad OS, Inc. All rights reserved. <a href="https://blackroad.io">blackroad.io</a></div>
+</div></body></html>`;
+      return new Response(catHtml, { headers: { ...CORS, 'Content-Type': 'text/html;charset=UTF-8', 'Cache-Control': 'public, max-age=1800' } });
     }
 
     await ensureTables(env.DB);
+    // Analytics tracking
+    if (path === '/api/track' && method === 'POST') {
+      try { const body = await request.json(); const cf = request.cf || {};
+        await env.DB.prepare("CREATE TABLE IF NOT EXISTS analytics_events (id INTEGER PRIMARY KEY AUTOINCREMENT, type TEXT DEFAULT 'pageview', path TEXT, referrer TEXT, country TEXT, city TEXT, device TEXT, screen TEXT, scroll_depth INTEGER DEFAULT 0, engagement_ms INTEGER DEFAULT 0, created_at TEXT DEFAULT (datetime('now')))").run();
+        await env.DB.prepare('INSERT INTO analytics_events (type, path, referrer, country, city, device, screen, scroll_depth, engagement_ms) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').bind(body.type||'pageview', body.path||'/', body.referrer||'', cf.country||'', cf.city||'', body.device||'', body.screen||'', body.scroll||0, body.time||0).run();
+      } catch(e) {}
+      return json({ ok: true });
+    }
+
+    // ── Sovereign Analytics ──
+    if (path === '/api/analytics' && request.method === 'POST') {
+      try {
+        const body = await request.json();
+        const cf = request.cf || {};
+        const ip = request.headers.get('CF-Connecting-IP') || '';
+        const ipHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ip + '2026'));
+        const visitor = btoa(String.fromCharCode(...new Uint8Array(ipHash))).slice(0,12);
+        await env.DB.prepare(`CREATE TABLE IF NOT EXISTS br_analytics (id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT, referrer TEXT, visitor TEXT, country TEXT, city TEXT, screen TEXT, ts TEXT DEFAULT (datetime('now')))`).run();
+        await env.DB.prepare('INSERT INTO br_analytics (path, referrer, visitor, country, city, screen) VALUES (?,?,?,?,?,?)').bind(body.path||'/', body.ref||'', visitor, cf.country||'', cf.city||'', (body.w||0)+'x'+(body.h||0)).run();
+      } catch(e){}
+      return new Response('ok', {headers:{'Access-Control-Allow-Origin':'*'}});
+    }
+    if (path === '/api/analytics/stats') {
+      try {
+        await env.DB.prepare(`CREATE TABLE IF NOT EXISTS br_analytics (id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT, referrer TEXT, visitor TEXT, country TEXT, city TEXT, screen TEXT, ts TEXT DEFAULT (datetime('now')))`).run();
+        const total = await env.DB.prepare('SELECT COUNT(*) as c FROM br_analytics').first();
+        const unique = await env.DB.prepare('SELECT COUNT(DISTINCT visitor) as c FROM br_analytics').first();
+        const today = await env.DB.prepare("SELECT COUNT(*) as c FROM br_analytics WHERE ts > datetime('now','-1 day')").first();
+        const pages = await env.DB.prepare('SELECT path, COUNT(*) as views FROM br_analytics GROUP BY path ORDER BY views DESC LIMIT 10').all();
+        const countries = await env.DB.prepare('SELECT country, COUNT(*) as c FROM br_analytics WHERE country != "" GROUP BY country ORDER BY c DESC LIMIT 10').all();
+        return new Response(JSON.stringify({total_views:total?.c||0,unique_visitors:unique?.c||0,today:today?.c||0,top_pages:pages?.results||[],top_countries:countries?.results||[]}),{headers:{'Access-Control-Allow-Origin':'*','Content-Type':'application/json'}});
+      } catch(e) { return new Response(JSON.stringify({error:'analytics unavailable'}),{status:500,headers:{'Content-Type':'application/json'}}); }
+    }
+
+
 
     // Health
     if ((path === '/health' || path === '/api/health') && method === 'GET') {
@@ -1452,7 +2169,7 @@ export default {
         const md = `# ${pub.title}\n\n*By ${pub.author} | Reading time: ${pub.reading_time || estimateReadingTime(pub.content)} min*\n\n> ${pub.summary || ''}\n\n${pub.content}${provenance}`;
         return new Response(md, { status: 200, headers: { ...CORS, 'Content-Type': 'text/markdown; charset=utf-8', 'Content-Disposition': `attachment; filename="${pub.title.replace(/[^a-zA-Z0-9]/g, '_')}.md"` } });
       } else if (format === 'html') {
-        const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${pub.title}</title><style>body{font-family:Georgia,serif;max-width:700px;margin:40px auto;padding:0 20px;color:#333;line-height:1.7}h1{font-size:28px}blockquote{border-left:3px solid #ccc;padding-left:16px;color:#666;font-style:italic}.meta{color:#888;font-size:14px}.provenance{margin-top:40px;padding-top:20px;border-top:1px solid #eee;font-size:12px;color:#999}</style></head><body><h1>${pub.title}</h1><p class="meta">By ${pub.author} | ${pub.reading_time || 1} min read | v${pub.version}</p><blockquote>${pub.summary || ''}</blockquote><div>${pub.content.replace(/\n/g, '<br>')}</div><div class="provenance">RoadBook (BlackRoad OS) | DOI: ${pub.doi || generateDOI(pub.id)} | Hash: ${(pub.provenance_hash || '').slice(0, 16)}... | ${pub.license}</div></body></html>`;
+        const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${pub.title}</title></head><body><h1>${pub.title}</h1><p>By ${pub.author}</p><div>${pub.content || ''}</div><hr><pre>${provenance}</pre></body></html>`;
         return new Response(html, { status: 200, headers: { ...CORS, 'Content-Type': 'text/html; charset=utf-8', 'Content-Disposition': `attachment; filename="${pub.title.replace(/[^a-zA-Z0-9]/g, '_')}.html"` } });
       } else {
         // JSON export with full provenance
@@ -3536,6 +4253,138 @@ export default {
         by_platform: byPlatform.results || [],
         recent: recentSyndications.results || [],
       });
+    }
+
+    // ─── Reading Lists (curated sequences) ───
+    if (path === '/api/lists' && method === 'POST') {
+      const body = await request.json();
+      if (!body.title) return json({ error: 'title required' }, 400);
+      await env.DB.prepare("CREATE TABLE IF NOT EXISTS rb_lists (id TEXT PRIMARY KEY, title TEXT, description TEXT, articles TEXT DEFAULT '[]', author TEXT, is_public INTEGER DEFAULT 1, followers INTEGER DEFAULT 0, created_at TEXT DEFAULT (datetime('now')))").run();
+      const id = crypto.randomUUID();
+      await env.DB.prepare('INSERT INTO rb_lists (id, title, description, articles, author) VALUES (?, ?, ?, ?, ?)').bind(id, body.title, body.description || '', JSON.stringify(body.articles || []), body.author || 'anonymous').run();
+      return json({ id, title: body.title }, 201);
+    }
+    if (path === '/api/lists' && method === 'GET') {
+      await env.DB.prepare("CREATE TABLE IF NOT EXISTS rb_lists (id TEXT PRIMARY KEY, title TEXT, description TEXT, articles TEXT DEFAULT '[]', author TEXT, is_public INTEGER DEFAULT 1, followers INTEGER DEFAULT 0, created_at TEXT DEFAULT (datetime('now')))").run();
+      const result = await env.DB.prepare('SELECT * FROM rb_lists WHERE is_public = 1 ORDER BY followers DESC, created_at DESC LIMIT 20').all();
+      return json({ lists: (result.results || []).map(l => ({ ...l, articles: JSON.parse(l.articles || '[]') })) });
+    }
+
+    // ─── AI Recommend ───
+    if (path === '/api/recommend' && method === 'GET') {
+      const interest = url.searchParams.get('interest') || '';
+      const limit = Math.min(10, parseInt(url.searchParams.get('limit') || '5'));
+      let query = "SELECT id, title, summary, category, reads, reading_time FROM roadbook_publications WHERE visibility = 'public'";
+      const params = [];
+      if (interest) { query += ' AND (category LIKE ? OR title LIKE ? OR summary LIKE ?)'; params.push(`%${interest}%`, `%${interest}%`, `%${interest}%`); }
+      query += ' ORDER BY reads DESC LIMIT ?';
+      params.push(limit);
+      const result = await env.DB.prepare(query).bind(...params).all();
+      return json({ recommendations: result.results || [], interest });
+    }
+
+    // ─── Article Series ───
+    if (path === '/api/series' && method === 'POST') {
+      const body = await request.json();
+      if (!body.title) return json({ error: 'title required' }, 400);
+      await env.DB.prepare("CREATE TABLE IF NOT EXISTS rb_series (id TEXT PRIMARY KEY, title TEXT, description TEXT, article_ids TEXT DEFAULT '[]', author TEXT, created_at TEXT DEFAULT (datetime('now')))").run();
+      const id = crypto.randomUUID();
+      await env.DB.prepare('INSERT INTO rb_series (id, title, description, article_ids, author) VALUES (?, ?, ?, ?, ?)').bind(id, body.title, body.description || '', JSON.stringify(body.article_ids || []), body.author || 'anonymous').run();
+      return json({ id, title: body.title }, 201);
+    }
+    if (path === '/api/series' && method === 'GET') {
+      await env.DB.prepare("CREATE TABLE IF NOT EXISTS rb_series (id TEXT PRIMARY KEY, title TEXT, description TEXT, article_ids TEXT DEFAULT '[]', author TEXT, created_at TEXT DEFAULT (datetime('now')))").run();
+      const result = await env.DB.prepare('SELECT * FROM rb_series ORDER BY created_at DESC LIMIT 20').all();
+      return json({ series: (result.results || []).map(s => ({ ...s, article_ids: JSON.parse(s.article_ids || '[]') })) });
+    }
+
+    // ─── Quick Summary (AI) ───
+    if (path === '/api/tldr' && method === 'POST') {
+      const body = await request.json();
+      if (!body.text && !body.publication_id) return json({ error: 'text or publication_id required' }, 400);
+      let text = body.text || '';
+      if (body.publication_id) {
+        const pub = await env.DB.prepare('SELECT content FROM roadbook_publications WHERE id = ?').bind(body.publication_id).first();
+        if (pub) text = pub.content;
+      }
+      if (!text) return json({ error: 'No content to summarize' }, 400);
+      try {
+        const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+          messages: [{ role: 'system', content: 'Give a TL;DR summary in exactly 2-3 sentences. Be direct and concrete.' }, { role: 'user', content: text.slice(0, 4000) }],
+          max_tokens: 150,
+        });
+        return json({ tldr: result.response });
+      } catch { return json({ tldr: text.slice(0, 200) + '...' }); }
+    }
+
+    // --- Enhanced: Publication versioning (v2) ---
+    const pubVersV2 = path.match(/^\/api\/pub\/([^/]+)\/versions$/);
+    if (pubVersV2 && method === 'GET') {
+      await env.DB.prepare("CREATE TABLE IF NOT EXISTS rb_pub_versions (id TEXT PRIMARY KEY, publication_id TEXT, version INTEGER, content TEXT, change_summary TEXT, chain_hash TEXT, created_at TEXT DEFAULT (datetime('now')))").run();
+      const rows = await env.DB.prepare('SELECT * FROM rb_pub_versions WHERE publication_id = ? ORDER BY version DESC').bind(pubVersV2[1]).all();
+      return json({versions:rows.results});
+    }
+
+    // --- Enhanced: Citations ---
+    const citeMatchV2 = path.match(/^\/api\/pub\/([^/]+)\/cite$/);
+    if (citeMatchV2 && method === 'POST') {
+      await env.DB.prepare("CREATE TABLE IF NOT EXISTS rb_citations (id TEXT PRIMARY KEY, publication_id TEXT, cited_by TEXT, context TEXT, created_at TEXT DEFAULT (datetime('now')))").run();
+      const body = await request.json();
+      const id = crypto.randomUUID().slice(0,12);
+      await env.DB.prepare("INSERT INTO rb_citations (id,publication_id,cited_by,context) VALUES (?,?,?,?)").bind(id,citeMatchV2[1],body.citing_publication_id||'',body.context||'').run();
+      return json({ok:true,id});
+    }
+    const citationsV2 = path.match(/^\/api\/pub\/([^/]+)\/citations$/);
+    if (citationsV2 && method === 'GET') {
+      try { await env.DB.prepare("CREATE TABLE IF NOT EXISTS rb_citations (id TEXT PRIMARY KEY, publication_id TEXT, cited_by TEXT, context TEXT, created_at TEXT DEFAULT (datetime('now')))").run(); } catch{}
+      const rows = await env.DB.prepare('SELECT * FROM rb_citations WHERE publication_id = ? ORDER BY created_at DESC').bind(citationsV2[1]).all();
+      return json({citations:rows.results});
+    }
+
+    // --- Enhanced: Publish with DOI + RoadChain ---
+    const publishMatch = path.match(/^\/api\/publications\/([^/]+)\/publish$/);
+    if (publishMatch && method === 'POST') {
+      const pub = await env.DB.prepare('SELECT * FROM rb_articles WHERE id = ?').bind(publishMatch[1]).first();
+      if (!pub) return json({error:'Publication not found'},404);
+      const doi = `ROAD-2026-${publishMatch[1].toUpperCase()}`;
+      await env.DB.prepare("UPDATE rb_articles SET status = 'published', doi = ?, published_at = datetime('now'), updated_at = datetime('now') WHERE id = ?").bind(doi,publishMatch[1]).run();
+      // Version snapshot
+      try {
+        await env.DB.prepare("CREATE TABLE IF NOT EXISTS rb_pub_versions (id TEXT PRIMARY KEY, publication_id TEXT, version INTEGER, content TEXT, change_summary TEXT, chain_hash TEXT, created_at TEXT DEFAULT (datetime('now')))").run();
+        const cnt = await env.DB.prepare('SELECT COUNT(*) as c FROM rb_pub_versions WHERE publication_id = ?').bind(publishMatch[1]).first();
+        await env.DB.prepare("INSERT INTO rb_pub_versions (id,publication_id,version,content,change_summary) VALUES (?,?,?,?,?)").bind(crypto.randomUUID().slice(0,12),publishMatch[1],(cnt?.c||0)+1,pub.content||'','Published').run();
+      } catch{}
+      // Stamp RoadChain
+      let chainHash = null;
+      try { const r = await fetch('https://roadchain.blackroad.io/api/event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({app:'roadbook',type:'published',data:{id:publishMatch[1],doi,title:pub.title}})}); const d = await r.json(); chainHash = d.stamp; } catch{}
+      // Earn RoadCoin
+      try { await fetch('https://roadcoin.blackroad.io/api/earn',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({road_id:pub.author||'system',action:'publication',amount:5,source_product:'roadbook'})}); } catch{}
+      return json({ok:true,doi,chain_hash:chainHash,status:'published'});
+    }
+
+    // --- Enhanced: Reading lists ---
+    if (path === '/api/reading-lists' && method === 'POST') {
+      await env.DB.prepare("CREATE TABLE IF NOT EXISTS rb_reading_lists (id TEXT PRIMARY KEY, name TEXT, user_id TEXT, items TEXT DEFAULT '[]', created_at TEXT DEFAULT (datetime('now')))").run();
+      const body = await request.json();
+      const id = crypto.randomUUID().slice(0,12);
+      await env.DB.prepare("INSERT INTO rb_reading_lists (id,name,user_id) VALUES (?,?,?)").bind(id,body.name||'My List',body.user_id||'anonymous').run();
+      return json({ok:true,id},201);
+    }
+    if (path === '/api/reading-lists' && method === 'GET') {
+      try { await env.DB.prepare("CREATE TABLE IF NOT EXISTS rb_reading_lists (id TEXT PRIMARY KEY, name TEXT, user_id TEXT, items TEXT DEFAULT '[]', created_at TEXT DEFAULT (datetime('now')))").run(); } catch{}
+      const uid = url.searchParams.get('user_id') || '';
+      const rows = uid ? await env.DB.prepare('SELECT * FROM rb_reading_lists WHERE user_id = ?').bind(uid).all() : await env.DB.prepare('SELECT * FROM rb_reading_lists ORDER BY created_at DESC LIMIT 50').all();
+      return json({lists:rows.results});
+    }
+
+    // --- Enhanced: Featured/trending ---
+    if (path === '/api/featured') {
+      const rows = await env.DB.prepare('SELECT id,title,author,abstract,views,status FROM rb_articles WHERE status = ? ORDER BY views DESC LIMIT 10').bind('published').all();
+      return json({featured:rows.results});
+    }
+    if (path === '/api/trending-publications') {
+      const rows = await env.DB.prepare("SELECT id,title,author,abstract,views FROM rb_articles WHERE status = 'published' AND published_at >= datetime('now','-7 days') ORDER BY views DESC LIMIT 10").all();
+      return json({trending:rows.results});
     }
 
     return json({ error: 'Not found', service: 'roadbook' }, 404);
